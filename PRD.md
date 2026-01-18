@@ -55,11 +55,12 @@ The app requires multiple interconnected views (feed, profile, lists, approval d
 - **Success criteria**: Form validates inputs, unique usernames enforced, 16-digit Viz. Biz ID generated, user data persists, logged-in state displays correctly
 
 ### User Login System
-- **Functionality**: Modal-based authentication accepting username, email, or phone with password
-- **Purpose**: Allows existing users to access their accounts
+- **Functionality**: Modal-based authentication with email/phone toggle and dual authentication methods (password or OTP)
+- **Purpose**: Allows existing users to access their accounts with flexible authentication options
 - **Trigger**: Click "Log In" button in header
-- **Progression**: Open modal → Enter credentials → Validate → Auto-login → Show welcome toast
-- **Success criteria**: Credentials validated against stored users, error messages displayed for invalid login, logged-in state persists
+- **Progression (Password)**: Open modal → Toggle email/phone → Enter credentials → Enter password → Validate → Auto-login → Show welcome toast
+- **Progression (OTP)**: Open modal → Toggle email/phone → Enter credentials → Switch to OTP tab → Send 6-digit code → Enter code within 5 minutes → Verify → Auto-login → Show welcome toast
+- **Success criteria**: Both authentication methods work correctly, OTP expires after 5 minutes, forgot password link accessible, modal has pastel pink header bar, active tab shows pink underline, success messages in mint green, all errors handled gracefully
 
 ### Logged-In User Interface
 - **Functionality**: Header displays user's shield avatar and username with dropdown menu
