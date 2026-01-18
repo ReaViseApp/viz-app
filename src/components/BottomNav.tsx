@@ -1,15 +1,15 @@
 import { useState } from "react"
-import { PencilSimple, Stamp, ListChecks } from "@phosphor-icons/react"
+import { House, PencilSimple, Stamp, ListChecks } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 
-type SidebarPage = "viz-it" | "approval" | "viz-list" | "viz-let"
+type SidebarPage = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let"
 
 interface BottomNavProps {
   activePage?: SidebarPage
   onPageChange?: (page: SidebarPage) => void
 }
 
-export function BottomNav({ activePage = "viz-it", onPageChange }: BottomNavProps) {
+export function BottomNav({ activePage = "feed", onPageChange }: BottomNavProps) {
   const [active, setActive] = useState<SidebarPage>(activePage)
 
   const handleClick = (page: SidebarPage) => {
@@ -18,6 +18,7 @@ export function BottomNav({ activePage = "viz-it", onPageChange }: BottomNavProp
   }
 
   const navItems = [
+    { id: "feed" as SidebarPage, label: "Home", icon: House },
     { id: "viz-it" as SidebarPage, label: "Viz.It", icon: PencilSimple },
     { id: "approval" as SidebarPage, label: "Approval", icon: Stamp },
     { id: "viz-list" as SidebarPage, label: "Viz.List", icon: ListChecks },

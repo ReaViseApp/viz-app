@@ -40,12 +40,12 @@ The app requires multiple interconnected views (feed, profile, lists, approval d
 - **Progression**: Image loaded → Clipped to shield path → Border applied → Rendered
 - **Success criteria**: Shape is consistent across all sizes, images don't distort, shield shape is recognizable
 
-### Viz.It Creator Tool
-- **Functionality**: Tool for creators to upload content and define selectable areas with permissions
-- **Purpose**: Empowers creators to control how their content can be reused
-- **Trigger**: Click "Viz.It" in sidebar
-- **Progression**: Open creator view → Upload media → Draw selection areas → Set permission level → Add metadata → Publish
-- **Success criteria**: Intuitive drawing interface, clear permission options, published content appears in feed correctly
+### Viz.It Creator Tool (Content Upload System)
+- **Functionality**: Multi-step tool for creators to upload/capture content, define selectable areas with lasso drawing, and publish with metadata
+- **Purpose**: Empowers creators to control how their content can be reused while building a permission-based sharing ecosystem
+- **Trigger**: Click "Viz.It" in sidebar (requires logged-in user)
+- **Progression**: Click Viz.It → Choose "Take/Upload" or "From Viz.List" → Step 1: Capture or upload media (photo/video) → Preview and confirm → Step 2: Draw freehand lasso selections on canvas → Set each selection as "Open" (mint) or "Approval Required" (peach) → Delete/edit selections → Step 3: Add title (max 20 words with live counter) → Add hashtags (auto-formatted with #) → Preview final content → Publish → Confetti animation → Success toast → Redirect to feed
+- **Success criteria**: Camera access works, file uploads accept images/videos, canvas lasso drawing is smooth and intuitive, selection areas save with correct coordinates, permission types are visually distinct, word counter turns coral when over limit, published posts appear in feed with interactive overlays, confetti animation plays on success
 
 ### User Registration System
 - **Functionality**: Modal-based registration with email/phone options, username creation, password setup, and terms acceptance
