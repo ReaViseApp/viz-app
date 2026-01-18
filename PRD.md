@@ -97,19 +97,49 @@ The app requires multiple interconnected views (feed, profile, lists, approval d
 - **Success criteria**: Requests update in real-time, approval/denial is immediate, requestor is notified
 
 ### Editorial Creation System (Viz.Edit)
-- **Functionality**: Multi-step editorial creator that allows users to design visual compositions using approved items from their Viz.List
+- **Functionality**: Multi-step editorial creator that allows users to design visual compositions using approved items from their Viz.List, with full-screen viewer for published editorials
 - **Purpose**: Enables users to create original editorial content by remixing and composing saved visual elements with creative tools
 - **Trigger**: Click "Viz.It" in sidebar → Choose "From Viz.List"
 - **Progression**: 
   - **Step 1 - Select Content**: View grid of approved Viz.List items (pending/declined hidden) → Multi-select items with click/tap → Selected items show pink border, checkmark, scale animation → Must select at least 1 item → Click "Next" 
   - **Step 2 - Canvas Editor**: Three-column layout (Toolbox | Canvas | Assets) → Use tools (Add Caption, Add Shapes, Add Emojis, Add Graffiti, Background Color) to add elements → Drag assets from right panel onto 600x600px square canvas → Move, resize, rotate, layer, delete canvas elements → Manage multiple pages (add, delete, reorder) via bottom thumbnails → Click "Save Draft" or "Publish"
   - **Step 3 - Preview & Publish**: Preview all pages in carousel → Swipe/arrow keys to navigate → Add optional title → Review assets used → Click "Confirm Publish" → Confetti animation → Success toast "Your Viz.Edit is live!" → Redirect to feed
+  - **Feed Display**: Editorial cards show "VizEdit" badge in pastel pink, first page thumbnail, quoted content count ("X from Viz.Listings"), multi-page indicator dots
+  - **Full-Screen Viewer**: Click card opens modal → Page-by-page navigation with swipe/arrows → Quoted content areas highlighted with pink borders → Click quoted area shows "View Original Reference" and "Viz.List This" buttons → Page indicator dots at bottom → Close with X button in top-right
 - **Success criteria**: 
   - Only approved items visible in Step 1, multi-select works smoothly with visual feedback
   - Canvas editor: all tools functional, drag-and-drop works, elements are editable (move/resize/rotate), grid pattern visible for alignment
   - Page management: can add/delete/reorder pages (minimum 1 page), thumbnails show current page highlight
   - Preview: carousel navigation works, all pages render correctly with elements in correct positions
-  - Published editorials appear in main feed with "VizEdit" badge, confetti plays on publish, editorial data saved with all pages and asset references
+  - Published editorials appear in main feed with "VizEdit" badge, quoted content count displayed, confetti plays on publish
+  - Full-screen viewer: opens on card click, keyboard navigation (arrows, Escape), quoted areas are clickable and show action buttons, smooth page transitions
+
+### Enhanced Feed Display
+- **Functionality**: Mixed feed of posts and editorials with interactive overlays and "New Viz.Its" notification banner
+- **Purpose**: Provides dynamic content discovery with visual indicators for quotable areas and fresh content alerts
+- **Trigger**: Navigate to home/feed page
+- **Progression**: View combined feed → See posts with selection overlays (mint/peach borders pulsing) → See editorials with VizEdit badge → Click "New Viz.Its" banner to load fresh content → Hover selection areas to see brighter borders → Click to open "Viz.List This" popup
+- **Success criteria**: 
+  - Posts and editorials are properly mixed in chronological order
+  - Selection overlays visible with correct color coding (mint for open, peach for approval)
+  - "New Viz.Its" banner appears as pastel pink pill with sparkle icon at top of feed
+  - Editorial cards show quoted content count and multi-page indicators
+  - All interactions smooth and responsive
+
+### Enhanced Profile Page
+- **Functionality**: User profile with avatar, stats, bio, tabs for different content types (All Viz.Its, Viz.Edits, Viz.List), grid displays with hover previews
+- **Purpose**: Comprehensive view of user's content, creations, and saved items with social metrics
+- **Trigger**: Click user avatar or navigate to profile
+- **Progression**: View profile header (shield avatar, username, bio, stats: posts/followers/following) → Edit Profile button (own) or Follow button (others) → Switch tabs → View content grids (3-col desktop, 2-col mobile) → Hover items to see view counts → Click to view full content
+- **Success criteria**:
+  - Shield-shaped avatar displays correctly at 120x140px
+  - Stats show accurate counts for posts, followers, following
+  - Follow button: pastel pink when unfollowed, outlined when following
+  - Tabs: "All Viz.Its" (all content), "Viz.Edits" (editorials only), "Viz.List" (saved items, owner-only)
+  - Active tab has pastel pink underline
+  - Grid items show selection overlays on posts, VizEdit badge on editorials
+  - Hover overlay shows view count with eye icon
+  - Responsive grid layout adapts to screen size
 
 ## Edge Case Handling
 
