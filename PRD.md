@@ -96,6 +96,21 @@ The app requires multiple interconnected views (feed, profile, lists, approval d
 - **Progression**: Open dashboard → See pending requests → Review request details → Approve or deny → Confirmation
 - **Success criteria**: Requests update in real-time, approval/denial is immediate, requestor is notified
 
+### Editorial Creation System (Viz.Edit)
+- **Functionality**: Multi-step editorial creator that allows users to design visual compositions using approved items from their Viz.List
+- **Purpose**: Enables users to create original editorial content by remixing and composing saved visual elements with creative tools
+- **Trigger**: Click "Viz.It" in sidebar → Choose "From Viz.List"
+- **Progression**: 
+  - **Step 1 - Select Content**: View grid of approved Viz.List items (pending/declined hidden) → Multi-select items with click/tap → Selected items show pink border, checkmark, scale animation → Must select at least 1 item → Click "Next" 
+  - **Step 2 - Canvas Editor**: Three-column layout (Toolbox | Canvas | Assets) → Use tools (Add Caption, Add Shapes, Add Emojis, Add Graffiti, Background Color) to add elements → Drag assets from right panel onto 600x600px square canvas → Move, resize, rotate, layer, delete canvas elements → Manage multiple pages (add, delete, reorder) via bottom thumbnails → Click "Save Draft" or "Publish"
+  - **Step 3 - Preview & Publish**: Preview all pages in carousel → Swipe/arrow keys to navigate → Add optional title → Review assets used → Click "Confirm Publish" → Confetti animation → Success toast "Your Viz.Edit is live!" → Redirect to feed
+- **Success criteria**: 
+  - Only approved items visible in Step 1, multi-select works smoothly with visual feedback
+  - Canvas editor: all tools functional, drag-and-drop works, elements are editable (move/resize/rotate), grid pattern visible for alignment
+  - Page management: can add/delete/reorder pages (minimum 1 page), thumbnails show current page highlight
+  - Preview: carousel navigation works, all pages render correctly with elements in correct positions
+  - Published editorials appear in main feed with "VizEdit" badge, confetti plays on publish, editorial data saved with all pages and asset references
+
 ## Edge Case Handling
 
 - **No Posts Available**: Show friendly empty state with "Welcome to Viz." message and suggestion to follow users

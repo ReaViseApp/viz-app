@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react"
 import { PostCard } from "./PostCard"
+import { EditorialCard } from "./EditorialCard"
 import { useKV } from "@github/spark/hooks"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -29,12 +30,36 @@ interface Post {
   }>
 }
 
+interface Editorial {
+  id: string
+  authorId: string
+  authorUsername: string
+  authorAvatar: string
+  pages: any[]
+  assetReferences: string[]
+  title?: string
+  publishedAt: string
+  type: "VizEdit"
+}
+
+type FeedItem = (Post | Editorial) & { itemType: "post" | "editorial" }
+
 export function Feed() {
   const [posts, setPosts] = useKV<Post[]>("feed-posts", [])
+  const [editorials] = useKV<Editorial[]>("viz-editorials", [])
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
   const observerTarget = useRef<HTMLDivElement>(null)
   const [initialized, setInitialized] = useState(false)
+
+  const combinedFeed: FeedItem[] = [
+    ...(editorials || []).map(e => ({ ...e, itemType: "editorial" as const })),
+    ...(posts || []).map(p => ({ ...p, itemType: "post" as const }))
+  ].sort((a, b) => {
+    const aTime = "publishedAt" in a ? new Date(a.publishedAt).getTime() : Date.now()
+    const bTime = "publishedAt" in b ? new Date(b.publishedAt).getTime() : Date.now()
+    return bTime - aTime
+  })
 
   useEffect(() => {
     if (!initialized && (!posts || posts.length === 0)) {
@@ -181,7 +206,7 @@ export function Feed() {
     )
   }
 
-  if (!posts || posts.length === 0 && !loading) {
+  if (!posts || posts.length === 0 && !loading && !editorials?.length) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <h2 className="text-2xl font-bold text-foreground mb-2">Welcome to Viz.</h2>
@@ -194,13 +219,20 @@ export function Feed() {
 
   return (
     <div className="w-full space-y-6 pb-12">
-      {posts && posts.map((post) => (
-        <PostCard
-          key={post.id}
-          post={post}
-          onLike={handleLike}
-          onComment={handleComment}
-        />
+      {combinedFeed.map((item) => (
+        item.itemType === "editorial" ? (
+          <EditorialCard
+            key={item.id}
+            editorial={item as Editorial}
+          />
+        ) : (
+          <PostCard
+            key={item.id}
+            post={item as Post}
+            onLike={handleLike}
+            onComment={handleComment}
+          />
+        )
       ))}
 
       {loading && (

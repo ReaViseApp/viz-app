@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Camera, Upload } from "@phosphor-icons/react"
 import { ContentUploadFlow } from "./ContentUploadFlow"
+import { EditorialCreationFlow } from "./editorial/EditorialCreationFlow"
 import { useKV } from "@github/spark/hooks"
 import { toast } from "sonner"
 
@@ -35,18 +36,7 @@ export function VizItPage() {
   }
 
   if (selectedOption === "vizlist") {
-    return (
-      <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-foreground mb-2">From Viz.List</h2>
-        <p className="text-muted-foreground mb-4">Edit content from your Viz.List</p>
-        <button 
-          onClick={() => setSelectedOption(null)}
-          className="text-primary hover:underline"
-        >
-          ← Back to options
-        </button>
-      </div>
-    )
+    return <EditorialCreationFlow onBack={() => setSelectedOption(null)} />
   }
 
   return (
