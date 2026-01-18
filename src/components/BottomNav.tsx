@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { House, PencilSimple, Stamp, ListChecks } from "@phosphor-icons/react"
+import { useKV } from "@github/spark/hooks"
 import { cn } from "@/lib/utils"
 
 type SidebarPage = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let"
@@ -9,19 +10,32 @@ interface BottomNavProps {
   onPageChange?: (page: SidebarPage) => void
 }
 
+interface ApprovalRequest {
+  id: string
+  requesterId: string
+  creatorId: string
+  status: "pending" | "approved" | "declined"
+}
+
 export function BottomNav({ activePage = "feed", onPageChange }: BottomNavProps) {
   const [active, setActive] = useState<SidebarPage>(activePage)
+  const [approvalRequests] = useKV<ApprovalRequest[]>("approval-requests", [])
+  const [currentUser] = useKV<{ id?: string; username?: string; vizBizId?: string } | null>("viz-current-user", null)
 
   const handleClick = (page: SidebarPage) => {
     setActive(page)
     onPageChange?.(page)
   }
 
+  const pendingIncomingCount = (approvalRequests || []).filter(
+    (req) => req.creatorId === (currentUser?.id || currentUser?.vizBizId || currentUser?.username) && req.status === "pending"
+  ).length
+
   const navItems = [
-    { id: "feed" as SidebarPage, label: "Home", icon: House },
-    { id: "viz-it" as SidebarPage, label: "Viz.It", icon: PencilSimple },
-    { id: "approval" as SidebarPage, label: "Approval", icon: Stamp },
-    { id: "viz-list" as SidebarPage, label: "Viz.List", icon: ListChecks },
+    { id: "feed" as SidebarPage, label: "Home", icon: House, badge: 0 },
+    { id: "viz-it" as SidebarPage, label: "Viz.It", icon: PencilSimple, badge: 0 },
+    { id: "approval" as SidebarPage, label: "Approval", icon: Stamp, badge: pendingIncomingCount },
+    { id: "viz-list" as SidebarPage, label: "Viz.List", icon: ListChecks, badge: 0 },
   ]
 
   return (
@@ -42,10 +56,17 @@ export function BottomNav({ activePage = "feed", onPageChange }: BottomNavProps)
                   : "text-muted-foreground"
               )}
             >
-              <Icon 
-                size={24} 
-                weight={isActive ? "fill" : "regular"}
-              />
+              <div className="relative">
+                <Icon 
+                  size={24} 
+                  weight={isActive ? "fill" : "regular"}
+                />
+                {item.badge > 0 && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#FF6B6B] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {item.badge}
+                  </div>
+                )}
+              </div>
               <span className="text-xs font-semibold">{item.label}</span>
             </button>
           )

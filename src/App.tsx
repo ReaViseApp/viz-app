@@ -5,6 +5,7 @@ import { BottomNav } from "@/components/BottomNav"
 import { Footer } from "@/components/Footer"
 import { Feed } from "@/components/Feed"
 import { VizItPage } from "@/components/VizItPage"
+import { ApprovalStatusPage } from "@/components/ApprovalStatusPage"
 import { Toaster } from "@/components/ui/sonner"
 
 type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let"
@@ -27,7 +28,7 @@ function App() {
           <div className="container max-w-[600px] mx-auto px-4 py-8">
             {currentPage === "feed" && <Feed />}
             {currentPage === "viz-it" && <VizItPage />}
-            {currentPage === "approval" && <div className="text-center py-20 text-muted-foreground">Approval Status - Coming Soon</div>}
+            {currentPage === "approval" && <ApprovalStatusPage />}
             {currentPage === "viz-list" && <div className="text-center py-20 text-muted-foreground">Viz.List - Coming Soon</div>}
           </div>
         </main>

@@ -9,6 +9,7 @@ import { SelectionOverlay } from "./SelectionOverlay"
 import { Heart, ChatCircle, PaperPlaneRight, ListChecks, DotsThree } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
+import { useKV } from "@github/spark/hooks"
 
 interface Comment {
   id: string
@@ -46,6 +47,26 @@ interface PostCardProps {
   onComment?: (postId: string, comment: string) => void
 }
 
+interface ApprovalRequest {
+  id: string
+  requesterId: string
+  requesterUsername: string
+  requesterAvatar: string
+  creatorId: string
+  creatorUsername: string
+  creatorAvatar: string
+  contentId: string
+  contentThumbnail: string
+  selectionArea: {
+    left: number
+    top: number
+    width: number
+    height: number
+  }
+  requestDate: string
+  status: "pending" | "approved" | "declined"
+}
+
 export function PostCard({ post, onLike, onComment }: PostCardProps) {
   const [liked, setLiked] = useState(false)
   const [showAllComments, setShowAllComments] = useState(false)
@@ -53,6 +74,8 @@ export function PostCard({ post, onLike, onComment }: PostCardProps) {
   const [commentText, setCommentText] = useState("")
   const [showHeartAnimation, setShowHeartAnimation] = useState(false)
   const [lastTap, setLastTap] = useState(0)
+  const [approvalRequests, setApprovalRequests] = useKV<ApprovalRequest[]>("approval-requests", [])
+  const [currentUser] = useKV<{ id?: string; username: string; avatar: string; vizBizId?: string } | null>("viz-current-user", null)
 
   const handleLike = () => {
     setLiked(!liked)
@@ -126,8 +149,43 @@ export function PostCard({ post, onLike, onComment }: PostCardProps) {
           imageUrl={post.mediaUrl}
           selections={post.selections}
           authorUsername={post.author.username}
-          onAddToList={(selectionId) => console.log("Add to list:", selectionId)}
-          onRequestApproval={(selectionId) => console.log("Request approval:", selectionId)}
+          onAddToList={(selectionId) => {
+            toast.success("Added to Viz.List!")
+          }}
+          onRequestApproval={(selectionId) => {
+            if (!currentUser) {
+              toast.error("Please log in to request approval")
+              return
+            }
+            
+            const selection = post.selections.find(s => s.id === selectionId)
+            if (!selection) return
+            
+            const userId = currentUser.id || currentUser.vizBizId || currentUser.username || "unknown"
+            
+            const newRequest: ApprovalRequest = {
+              id: `request-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              requesterId: userId,
+              requesterUsername: currentUser.username,
+              requesterAvatar: currentUser.avatar,
+              creatorId: post.author.username,
+              creatorUsername: post.author.username,
+              creatorAvatar: post.author.avatar,
+              contentId: post.id,
+              contentThumbnail: post.mediaUrl,
+              selectionArea: {
+                left: selection.left,
+                top: selection.top,
+                width: selection.width,
+                height: selection.height
+              },
+              requestDate: new Date().toISOString(),
+              status: "pending"
+            }
+            
+            setApprovalRequests((current) => [...(current || []), newRequest])
+            toast.success(`Approval request sent to @${post.author.username}`)
+          }}
         />
         {showHeartAnimation && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
