@@ -47,6 +47,27 @@ The app requires multiple interconnected views (feed, profile, lists, approval d
 - **Progression**: Open creator view → Upload media → Draw selection areas → Set permission level → Add metadata → Publish
 - **Success criteria**: Intuitive drawing interface, clear permission options, published content appears in feed correctly
 
+### User Registration System
+- **Functionality**: Modal-based registration with email/phone options, username creation, password setup, and terms acceptance
+- **Purpose**: Enables users to create accounts and access personalized features
+- **Trigger**: Click "Sign Up for Viz." button in header
+- **Progression**: Open modal → Choose email/phone registration → Enter credentials → Read and accept terms → Create account → Auto-login → Show success toast
+- **Success criteria**: Form validates inputs, unique usernames enforced, 16-digit Viz. Biz ID generated, user data persists, logged-in state displays correctly
+
+### User Login System
+- **Functionality**: Modal-based authentication accepting username, email, or phone with password
+- **Purpose**: Allows existing users to access their accounts
+- **Trigger**: Click "Log In" button in header
+- **Progression**: Open modal → Enter credentials → Validate → Auto-login → Show welcome toast
+- **Success criteria**: Credentials validated against stored users, error messages displayed for invalid login, logged-in state persists
+
+### Logged-In User Interface
+- **Functionality**: Header displays user's shield avatar and username with dropdown menu
+- **Purpose**: Provides quick access to profile, settings, and logout
+- **Trigger**: User successfully logs in or registers
+- **Progression**: Avatar displayed in header → Click avatar → Dropdown appears → Select option (Profile/Settings/Logout)
+- **Success criteria**: Avatar renders correctly, dropdown styled with pink shadow, logout clears session
+
 ### Viz.List Personal Collections
 - **Functionality**: Saved selections organized in user's personal collection
 - **Purpose**: Allows users to curate visual mood boards and inspiration collections
