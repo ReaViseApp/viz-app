@@ -29,9 +29,27 @@ interface ApprovalRequest {
   status: "pending" | "approved" | "declined"
 }
 
+interface VizListItem {
+  id: string
+  contentId: string
+  contentThumbnail: string
+  selectionArea: {
+    left: number
+    top: number
+    width: number
+    height: number
+  }
+  creatorUsername: string
+  creatorAvatar: string
+  status: "approved" | "pending" | "declined"
+  addedDate: string
+  approvalRequestId?: string
+}
+
 export function ApprovalStatusPage() {
   const [approvalRequests, setApprovalRequests] = useKV<ApprovalRequest[]>("approval-requests", [])
   const [currentUser] = useKV<{ id?: string; username: string; avatar: string; vizBizId?: string } | null>("viz-current-user", null)
+  const [vizList, setVizList] = useKV<VizListItem[]>("viz-list-items", [])
 
   const seedDemoRequests = () => {
     if (!currentUser) {
@@ -92,6 +110,15 @@ export function ApprovalStatusPage() {
         req.id === requestId ? { ...req, status: "approved" as const } : req
       )
     )
+    
+    setVizList((current) =>
+      (current || []).map((item) =>
+        item.approvalRequestId === requestId 
+          ? { ...item, status: "approved" as const }
+          : item
+      )
+    )
+    
     toast.success("Request approved!")
   }
 
@@ -101,6 +128,15 @@ export function ApprovalStatusPage() {
         req.id === requestId ? { ...req, status: "declined" as const } : req
       )
     )
+    
+    setVizList((current) =>
+      (current || []).map((item) =>
+        item.approvalRequestId === requestId 
+          ? { ...item, status: "declined" as const }
+          : item
+      )
+    )
+    
     toast.success("Request declined")
   }
 

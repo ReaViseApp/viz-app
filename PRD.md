@@ -70,11 +70,24 @@ The app requires multiple interconnected views (feed, profile, lists, approval d
 - **Success criteria**: Avatar renders correctly, dropdown styled with pink shadow, logout clears session
 
 ### Viz.List Personal Collections
-- **Functionality**: Saved selections organized in user's personal collection
-- **Purpose**: Allows users to curate visual mood boards and inspiration collections
-- **Trigger**: Click "Viz.List" in sidebar or save selection from feed
-- **Progression**: Navigate to Viz.List → View saved selections in grid → Filter/organize → Share list
-- **Success criteria**: Selections save correctly with attribution, grid layout is visually appealing, sharing works
+- **Functionality**: Saved selections organized in user's personal collection with status-based filtering and search capabilities
+- **Purpose**: Allows users to curate visual mood boards and inspiration collections, tracking approval status for each item
+- **Trigger**: Click "Viz.List" in sidebar or save selection from feed via "Viz.List This" button in selection popups
+- **Progression**: 
+  - From Feed: Hover selection → Click → Popup appears → Click "Viz.List This" → Item added with appropriate status (approved/pending)
+  - Navigate to Viz.List page → View saved selections in responsive grid (3 columns desktop, 2 mobile) → Filter by status tabs (All/Approved/Pending/Declined) → Search by creator → Click approved items → View options popup → Use in Viz.It, View Original, or Remove
+- **Success criteria**: 
+  - "Open to Repost" selections added immediately with "approved" status and mint toast
+  - "Approval Required" selections added with "pending" status and peach toast
+  - Pending and declined items displayed with grayscale filter
+  - Approved items shown in full color with mint checkmark badge
+  - Status badges visible in grid thumbnails (top-right corner)
+  - Creator username displayed in bottom-left of thumbnails
+  - Declined items show "Remove" button on hover
+  - Empty state displays with illustration and "Explore Feed" CTA button
+  - Search filters by creator username in real-time
+  - Tab counts update dynamically based on status
+  - Status syncs with Approval Status page when requests are approved/declined
 
 ### Approval Status Dashboard
 - **Functionality**: View pending approval requests (outgoing and incoming) with approve/deny actions

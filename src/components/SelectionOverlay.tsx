@@ -20,14 +20,18 @@ interface SelectionOverlayProps {
   imageUrl: string
   selections: SelectionArea[]
   authorUsername: string
-  onAddToList?: (selectionId: string) => void
-  onRequestApproval?: (selectionId: string) => void
+  authorAvatar?: string
+  contentId: string
+  onAddToList?: (selectionId: string, selectionArea: SelectionArea) => void
+  onRequestApproval?: (selectionId: string, selectionArea: SelectionArea) => void
 }
 
 export function SelectionOverlay({ 
   imageUrl, 
   selections, 
   authorUsername,
+  authorAvatar,
+  contentId,
   onAddToList,
   onRequestApproval 
 }: SelectionOverlayProps) {
@@ -35,11 +39,15 @@ export function SelectionOverlay({
 
   const handleVizListClick = (selection: SelectionArea) => {
     if (selection.type === "open") {
-      onAddToList?.(selection.id)
-      toast.success("Added to Viz.List!")
+      onAddToList?.(selection.id, selection)
+      toast.success("Added to your Viz.List!", {
+        className: "bg-[#98D8AA] text-white"
+      })
     } else {
-      onRequestApproval?.(selection.id)
-      toast.success(`Approval request sent to @${authorUsername}`)
+      onRequestApproval?.(selection.id, selection)
+      toast.success(`Approval request sent to @${authorUsername}`, {
+        className: "bg-[#FFDAB3] text-[#1A1A1A]"
+      })
     }
     setOpenPopover(null)
   }

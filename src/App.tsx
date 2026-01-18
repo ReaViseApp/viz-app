@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer"
 import { Feed } from "@/components/Feed"
 import { VizItPage } from "@/components/VizItPage"
 import { ApprovalStatusPage } from "@/components/ApprovalStatusPage"
+import { VizListPage } from "@/components/VizListPage"
 import { Toaster } from "@/components/ui/sonner"
 
 type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let"
@@ -29,7 +30,8 @@ function App() {
             {currentPage === "feed" && <Feed />}
             {currentPage === "viz-it" && <VizItPage />}
             {currentPage === "approval" && <ApprovalStatusPage />}
-            {currentPage === "viz-list" && <div className="text-center py-20 text-muted-foreground">Viz.List - Coming Soon</div>}
+            {currentPage === "viz-list" && <VizListPage />}
+            {currentPage === "viz-let" && <div className="text-center py-20 text-muted-foreground">Viz.Let - Coming Soon</div>}
           </div>
         </main>
       </div>

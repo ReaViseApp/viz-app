@@ -67,6 +67,23 @@ interface ApprovalRequest {
   status: "pending" | "approved" | "declined"
 }
 
+interface VizListItem {
+  id: string
+  contentId: string
+  contentThumbnail: string
+  selectionArea: {
+    left: number
+    top: number
+    width: number
+    height: number
+  }
+  creatorUsername: string
+  creatorAvatar: string
+  status: "approved" | "pending" | "declined"
+  addedDate: string
+  approvalRequestId?: string
+}
+
 export function PostCard({ post, onLike, onComment }: PostCardProps) {
   const [liked, setLiked] = useState(false)
   const [showAllComments, setShowAllComments] = useState(false)
@@ -76,6 +93,7 @@ export function PostCard({ post, onLike, onComment }: PostCardProps) {
   const [lastTap, setLastTap] = useState(0)
   const [approvalRequests, setApprovalRequests] = useKV<ApprovalRequest[]>("approval-requests", [])
   const [currentUser] = useKV<{ id?: string; username: string; avatar: string; vizBizId?: string } | null>("viz-current-user", null)
+  const [vizList, setVizList] = useKV<VizListItem[]>("viz-list-items", [])
 
   const handleLike = () => {
     setLiked(!liked)
@@ -149,17 +167,37 @@ export function PostCard({ post, onLike, onComment }: PostCardProps) {
           imageUrl={post.mediaUrl}
           selections={post.selections}
           authorUsername={post.author.username}
-          onAddToList={(selectionId) => {
-            toast.success("Added to Viz.List!")
+          authorAvatar={post.author.avatar}
+          contentId={post.id}
+          onAddToList={(selectionId, selectionArea) => {
+            if (!currentUser) {
+              toast.error("Please log in to add to Viz.List")
+              return
+            }
+            
+            const newVizListItem: VizListItem = {
+              id: `vizlist-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              contentId: post.id,
+              contentThumbnail: post.mediaUrl,
+              selectionArea: {
+                left: selectionArea.left,
+                top: selectionArea.top,
+                width: selectionArea.width,
+                height: selectionArea.height
+              },
+              creatorUsername: post.author.username,
+              creatorAvatar: post.author.avatar,
+              status: "approved",
+              addedDate: new Date().toISOString()
+            }
+            
+            setVizList((current) => [...(current || []), newVizListItem])
           }}
-          onRequestApproval={(selectionId) => {
+          onRequestApproval={(selectionId, selectionArea) => {
             if (!currentUser) {
               toast.error("Please log in to request approval")
               return
             }
-            
-            const selection = post.selections.find(s => s.id === selectionId)
-            if (!selection) return
             
             const userId = currentUser.id || currentUser.vizBizId || currentUser.username || "unknown"
             
@@ -174,17 +212,35 @@ export function PostCard({ post, onLike, onComment }: PostCardProps) {
               contentId: post.id,
               contentThumbnail: post.mediaUrl,
               selectionArea: {
-                left: selection.left,
-                top: selection.top,
-                width: selection.width,
-                height: selection.height
+                left: selectionArea.left,
+                top: selectionArea.top,
+                width: selectionArea.width,
+                height: selectionArea.height
               },
               requestDate: new Date().toISOString(),
               status: "pending"
             }
             
             setApprovalRequests((current) => [...(current || []), newRequest])
-            toast.success(`Approval request sent to @${post.author.username}`)
+            
+            const newVizListItem: VizListItem = {
+              id: `vizlist-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              contentId: post.id,
+              contentThumbnail: post.mediaUrl,
+              selectionArea: {
+                left: selectionArea.left,
+                top: selectionArea.top,
+                width: selectionArea.width,
+                height: selectionArea.height
+              },
+              creatorUsername: post.author.username,
+              creatorAvatar: post.author.avatar,
+              status: "pending",
+              addedDate: new Date().toISOString(),
+              approvalRequestId: newRequest.id
+            }
+            
+            setVizList((current) => [...(current || []), newVizListItem])
           }}
         />
         {showHeartAnimation && (
