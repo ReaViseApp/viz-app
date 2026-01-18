@@ -3,7 +3,7 @@ import { House, PencilSimple, Stamp, ListChecks } from "@phosphor-icons/react"
 import { useKV } from "@github/spark/hooks"
 import { cn } from "@/lib/utils"
 
-type SidebarPage = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let"
+type SidebarPage = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile"
 
 interface SidebarProps {
   activePage?: SidebarPage

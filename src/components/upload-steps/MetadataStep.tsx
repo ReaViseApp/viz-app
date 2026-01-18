@@ -16,6 +16,7 @@ interface MetadataStepProps {
 }
 
 interface User {
+  id?: string
   username: string
   email?: string
   phone?: string
@@ -61,6 +62,7 @@ export function MetadataStep({ media, selections, onBack }: MetadataStepProps) {
   const [isPublishing, setIsPublishing] = useState(false)
   const [currentUser] = useKV<User | null>("viz-current-user", null)
   const [posts, setPosts] = useKV<Post[]>("feed-posts", [])
+  const [myVizItems, setMyVizItems] = useKV<any[]>("my-viz-items", [])
 
   useEffect(() => {
     const words = title.trim().split(/\s+/).filter(w => w.length > 0)
@@ -131,6 +133,36 @@ export function MetadataStep({ media, selections, onBack }: MetadataStepProps) {
     await new Promise(resolve => setTimeout(resolve, 1000))
 
     setPosts((currentPosts) => [newPost, ...(currentPosts || [])])
+
+    if (selections.length > 0) {
+      const myVizItem = {
+        id: `myviz-${Date.now()}`,
+        mediaUrl: media.url,
+        mediaType: media.type,
+        title: title,
+        hashtags: hashtagArray,
+        creatorId: currentUser.id || currentUser.vizBizId || currentUser.username,
+        selections: selections.map(sel => ({
+          id: sel.id,
+          coordinates: {
+            left: (sel.x / 800) * 100,
+            top: (sel.y / 800) * 100,
+            width: (sel.width / 800) * 100,
+            height: (sel.height / 800) * 100,
+          },
+          type: sel.type === "open" ? "open-to-repost" : "approval-required",
+          publishedBy: []
+        })),
+        createdDate: new Date().toISOString(),
+        stats: {
+          views: 0,
+          vizListCount: 0,
+          vizItCount: 0
+        }
+      }
+      
+      setMyVizItems((current) => [myVizItem, ...(current || [])])
+    }
 
     confetti({
       particleCount: 100,

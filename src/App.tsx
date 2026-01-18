@@ -7,9 +7,10 @@ import { Feed } from "@/components/Feed"
 import { VizItPage } from "@/components/VizItPage"
 import { ApprovalStatusPage } from "@/components/ApprovalStatusPage"
 import { VizListPage } from "@/components/VizListPage"
+import { ProfilePage } from "@/components/ProfilePage"
 import { Toaster } from "@/components/ui/sonner"
 
-type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let"
+type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile"
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("feed")
@@ -17,7 +18,7 @@ function App() {
   return (
     <div className="min-h-screen bg-background">
       <Toaster />
-      <Header />
+      <Header onNavigateToProfile={() => setCurrentPage("profile")} />
       
       <div className="flex">
         <Sidebar 
@@ -31,6 +32,7 @@ function App() {
             {currentPage === "viz-it" && <VizItPage />}
             {currentPage === "approval" && <ApprovalStatusPage />}
             {currentPage === "viz-list" && <VizListPage />}
+            {currentPage === "profile" && <ProfilePage />}
             {currentPage === "viz-let" && <div className="text-center py-20 text-muted-foreground">Viz.Let - Coming Soon</div>}
           </div>
         </main>

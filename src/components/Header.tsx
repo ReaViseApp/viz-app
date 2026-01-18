@@ -17,7 +17,11 @@ interface User {
   createdAt: string
 }
 
-export function Header() {
+interface HeaderProps {
+  onNavigateToProfile?: () => void
+}
+
+export function Header({ onNavigateToProfile }: HeaderProps) {
   const [showRegistration, setShowRegistration] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
   const [currentUser, setCurrentUser] = useKV<User | null>("viz-current-user", null)
@@ -25,6 +29,10 @@ export function Header() {
   const handleLogout = () => {
     setCurrentUser(null)
     toast.success("You've been logged out")
+  }
+
+  const handleProfileClick = () => {
+    onNavigateToProfile?.()
   }
 
   return (
@@ -69,7 +77,7 @@ export function Header() {
                 align="end" 
                 className="w-48 bg-background shadow-[0_4px_12px_rgba(255,182,193,0.2)]"
               >
-                <DropdownMenuItem>My Profile</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleProfileClick}>My Profile</DropdownMenuItem>
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>Log Out</DropdownMenuItem>
               </DropdownMenuContent>
