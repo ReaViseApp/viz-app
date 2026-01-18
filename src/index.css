@@ -9,6 +9,15 @@
   body {
     font-family: 'Plus Jakarta Sans', sans-serif;
   }
+  
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  [tabindex]:focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+  }
 }
 
 :root {
@@ -114,6 +123,15 @@
   }
 }
 
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
 .shield-avatar {
   clip-path: polygon(
     50% 0%,
@@ -140,4 +158,15 @@
 
 .heart-animation {
   animation: heart-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 182, 193, 0.1) 0%,
+    rgba(255, 182, 193, 0.2) 50%,
+    rgba(255, 182, 193, 0.1) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
 }

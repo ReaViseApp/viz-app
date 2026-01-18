@@ -8,9 +8,16 @@ Viz. is a visual content sharing platform that enables users to curate and repos
 3. **Social** - Community-focused features like approval requests, comments, and attribution maintain creator relationships while enabling remixing
 
 **Complexity Level**: Complex Application (advanced functionality, likely with multiple views)
-The app requires multiple interconnected views (feed, profile, lists, approval dashboard), real-time interactions (likes, comments, approval requests), media handling (images/videos with overlays), and sophisticated state management for user permissions and content selections.
+The app requires multiple interconnected views (feed, profile, lists, approval dashboard, marketplace, legal pages), real-time interactions (likes, comments, approval requests, notifications), media handling (images/videos with overlays), sophisticated state management for user permissions and content selections, e-commerce functionality, and comprehensive notification system.
 
 ## Essential Features
+
+### Notification System
+- **Functionality**: Notification bell in header with unread count badge, dropdown panel showing recent notifications with icons, messages, and timestamps
+- **Purpose**: Keep users informed of activity (approval requests, approvals, declines, editorial quotes, purchases) without leaving current page
+- **Trigger**: Click notification bell icon in header
+- **Progression**: Click bell → Dropdown opens showing notifications → Each notification displays type-specific icon (📌 for requests, checkmark for approved, X for declined, sparkle for quotes, shopping bag for purchases) → Unread notifications have pink background → Click "Mark all as read" → Click notification to mark individual as read → Click "View all notifications" for full page
+- **Success criteria**: Unread count displays correctly, notifications grouped by type with appropriate icons, timestamps show relative time (e.g., "2h ago"), pink background on unread items, dropdown positioned correctly with shadow, notifications persist across sessions
 
 ### Instagram-Style Feed
 - **Functionality**: Infinite-scrolling vertical feed displaying posts with media, captions, likes, and comments
@@ -171,6 +178,79 @@ The app requires multiple interconnected views (feed, profile, lists, approval d
   - Modal scrolls smoothly and close button works
   - Responsive layout: 4 columns on desktop, 2 on mobile
   - All hover states and transitions are smooth
+
+## Phase 12: Final Polish & Responsive Design
+
+### Navigation Improvements
+- **Logo Click Navigation**: Clicking "Viz." logo in header returns to homepage feed
+- **Page Transitions**: Smooth 200ms fade transitions between all pages using framer-motion
+- **Loading States**: Pastel pink spinner components for all data fetches and loading scenarios
+- **Breadcrumb Navigation**: Displayed on inner pages showing path (e.g., "Home > Viz.Let > Product")
+
+### Notification System (Detailed)
+- **Bell Icon**: Positioned in header to right of user avatar, displays coral red badge with unread count
+- **Dropdown Panel**: White background with pink shadow, scrollable list of notifications
+- **Notification Types**:
+  - 📌 icon: New approval request received
+  - ✓ icon (mint green): Your request was approved  
+  - ✗ icon (coral): Your request was declined
+  - ✨ icon (accent): Someone quoted your content in Viz.Edit
+  - 🛍️ icon (primary): Someone purchased your product
+- **Interactions**: "Mark all as read" link at top, "View all" link to full notifications page
+- **Visual States**: Unread notifications have light pink background, read notifications are white
+
+### Responsive Design Enhancements
+- **Mobile (< 768px)**:
+  - Sidebar hidden, bottom navigation bar with 5 icons visible
+  - Bottom nav icons: Home, Viz.It, Approval (with badge), Viz.List, Viz.Let
+  - Feed is full-width, no max-width constraint
+  - All modals are full-screen on mobile
+  - Touch-optimized tap targets (min 44x44px)
+- **Desktop (≥ 768px)**:
+  - Sidebar fixed on left, visible at all times
+  - Feed centered with max-width 600px for content, 900px for legal pages
+  - Hover states on selection areas and buttons
+  - Mouse cursor changes to pointer on interactive elements
+
+### Error Handling & Empty States
+- **Error Messages**: Coral red alerts with soft background, retry buttons where applicable
+- **Offline Indicator**: Peach banner showing "You're offline. Some features may be unavailable."
+- **Empty States**: Friendly illustrations with clear messaging:
+  - Empty feed: House icon, "Welcome to Viz.!", "No posts yet. Follow creators to see their content!", "Explore Viz." button
+  - Empty Viz.List: Tray icon, "Your Viz.List is empty", "Browse the feed and Viz.List your favorites!", "Explore Feed" button
+  - No search results: "No results for 'X'. Try different keywords."
+- **Form Validation**: Helpful error text below fields, real-time validation feedback
+
+### Accessibility Features
+- **Keyboard Navigation**: Full tab navigation support, Enter activates buttons, Escape closes modals
+- **Focus States**: Visible pastel pink outline (ring-2 ring-primary) on all focusable elements
+- **Screen Reader Support**: Proper ARIA labels on all interactive elements
+- **Alt Text**: Descriptive alt attributes on all images
+- **Color Contrast**: All text meets WCAG AA standards (documented in PRD color section)
+- **Semantic HTML**: Proper heading hierarchy, nav elements, button vs link usage
+
+### Performance Optimizations
+- **Lazy Loading**: Images load with placeholder shimmer animation using LazyImage component
+- **Skeleton States**: Light pink shimmer loading skeletons for content cards
+- **Infinite Scroll**: Feed loads 20 items at a time, observer-based pagination
+- **Optimized Animations**: All animations use CSS transforms for GPU acceleration
+
+### Legal Pages
+Five comprehensive legal pages accessible from footer:
+- **Terms of Service**: Detailed terms covering account usage, content rights, permissions system, marketplace rules, termination policy
+- **Privacy Policy**: Information collection, usage, sharing policies, user controls, data security, cookies
+- **About**: Mission statement, platform differentiators, values, community invitation
+- **Help/FAQ**: Organized sections covering getting started, permissions, content creation, marketplace, account management
+- **Contact**: Contact form with name, email, subject, message fields, support and business email addresses
+
+### Final Styling Consistency
+- **Primary Actions**: All use pastel pink (#FFB6C1 / oklch(0.85 0.08 350))
+- **Shield Avatars**: Applied consistently throughout entire app at all sizes
+- **Icon Consistency**: All sidebar/navigation icons from Phosphor Icons
+- **Spacing**: Consistent padding/margin using Tailwind's spacing scale
+- **Typography**: Plus Jakarta Sans at all weights, proper hierarchy maintained
+- **Animations**: 200ms transitions on buttons, 2s pulse on selection overlays, 600ms heart pop
+- **Shadows**: Pastel pink shadows (rgba(255,182,193,0.2)) on dropdowns and modals
 
 ## Edge Case Handling
 

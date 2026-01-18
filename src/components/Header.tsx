@@ -4,6 +4,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ShieldAvatar } from "./ShieldAvatar"
 import { RegistrationModal } from "./RegistrationModal"
 import { LoginModal } from "./LoginModal"
+import { NotificationBell } from "./NotificationBell"
 import { useKV } from "@github/spark/hooks"
 import { toast } from "sonner"
 
@@ -20,9 +21,10 @@ interface User {
 interface HeaderProps {
   onNavigateToProfile?: () => void
   onNavigateToSettings?: () => void
+  onNavigateToHome?: () => void
 }
 
-export function Header({ onNavigateToProfile, onNavigateToSettings }: HeaderProps) {
+export function Header({ onNavigateToProfile, onNavigateToSettings, onNavigateToHome }: HeaderProps) {
   const [showRegistration, setShowRegistration] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
   const [currentUser, setCurrentUser] = useKV<User | null>("viz-current-user", null)
@@ -36,13 +38,20 @@ export function Header({ onNavigateToProfile, onNavigateToSettings }: HeaderProp
     onNavigateToProfile?.()
   }
 
+  const handleLogoClick = () => {
+    onNavigateToHome?.()
+  }
+
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-2">
+          <button 
+            onClick={handleLogoClick}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
             <h1 className="text-2xl md:text-[32px] font-bold tracking-tight text-foreground">Viz.</h1>
-          </div>
+          </button>
           
           {!currentUser ? (
             <div className="flex items-center gap-2 md:gap-3">
@@ -63,26 +72,29 @@ export function Header({ onNavigateToProfile, onNavigateToSettings }: HeaderProp
               </Button>
             </div>
           ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                  <ShieldAvatar 
-                    src={currentUser.avatar} 
-                    alt={currentUser.username}
-                    size="small"
-                  />
-                  <span className="font-bold text-sm hidden md:inline">{currentUser.username}</span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="end" 
-                className="w-48 bg-background shadow-[0_4px_12px_rgba(255,182,193,0.2)]"
-              >
-                <DropdownMenuItem onClick={handleProfileClick}>My Profile</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onNavigateToSettings?.()}>Settings</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>Log Out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                    <ShieldAvatar 
+                      src={currentUser.avatar} 
+                      alt={currentUser.username}
+                      size="small"
+                    />
+                    <span className="font-bold text-sm hidden md:inline">{currentUser.username}</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="end" 
+                  className="w-48 bg-background shadow-[0_4px_12px_rgba(255,182,193,0.2)]"
+                >
+                  <DropdownMenuItem onClick={handleProfileClick}>My Profile</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onNavigateToSettings?.()}>Settings</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>Log Out</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           )}
         </div>
       </header>

@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from "react"
 import { PostCard } from "./PostCard"
 import { EditorialCard } from "./EditorialCard"
+import { EmptyState } from "./ErrorMessage"
 import { useKV } from "@github/spark/hooks"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Sparkle } from "@phosphor-icons/react"
+import { Sparkle, House } from "@phosphor-icons/react"
 
 interface Post {
   id: string
@@ -235,12 +236,15 @@ export function Feed() {
 
   if (!posts || posts.length === 0 && !loading && !editorials?.length) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Welcome to Viz.</h2>
-        <p className="text-muted-foreground">
-          Start following users to see their posts in your feed
-        </p>
-      </div>
+      <EmptyState
+        icon={<House className="w-20 h-20" />}
+        title="Welcome to Viz.!"
+        description="No posts yet. Follow creators to see their content!"
+        action={{
+          label: "Explore Viz.",
+          onClick: () => {}
+        }}
+      />
     )
   }
 
