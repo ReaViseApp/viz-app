@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { House, PencilSimple, Stamp, ListChecks } from "@phosphor-icons/react"
+import { House, PencilSimple, Stamp, ListChecks, Storefront } from "@phosphor-icons/react"
 import { useKV } from "@github/spark/hooks"
 import { cn } from "@/lib/utils"
 
@@ -36,6 +36,7 @@ export function BottomNav({ activePage = "feed", onPageChange }: BottomNavProps)
     { id: "viz-it" as SidebarPage, label: "Viz.It", icon: PencilSimple, badge: 0 },
     { id: "approval" as SidebarPage, label: "Approval", icon: Stamp, badge: pendingIncomingCount },
     { id: "viz-list" as SidebarPage, label: "Viz.List", icon: ListChecks, badge: 0 },
+    { id: "viz-let" as SidebarPage, label: "Viz.Let", icon: Storefront, badge: 0 },
   ]
 
   return (

@@ -141,6 +141,37 @@ The app requires multiple interconnected views (feed, profile, lists, approval d
   - Hover overlay shows view count with eye icon
   - Responsive grid layout adapts to screen size
 
+### Viz.Let E-Commerce Marketplace
+- **Functionality**: Full-featured marketplace for buying and selling products derived from Viz.List collections, with product discovery, shop browsing, search, filtering, and product detail views
+- **Purpose**: Monetize creative content by allowing creators to sell physical products (prints, merchandise) based on their popular Viz.Its and Viz.Listables
+- **Trigger**: Click "Viz.Let" (Storefront icon) in sidebar
+- **Progression**:
+  - **Marketplace Home**: View header with Storefront icon and "Shop Your Viz.Lists" tagline → Use search bar to find products/shops → Apply filter tabs (All, Trending, New Arrivals, Top Rated) → Select sort order (Newest, Price Low-High, Price High-Low, Most Popular)
+  - **Trending Section**: Browse horizontally scrollable row of trending products (auto-refresh every 60 seconds with fade transition) → See product cards with image, title, price, shop name, wishlist heart
+  - **Popular Shops Section**: Browse horizontally scrollable row of popular shops (auto-refresh every 60 seconds) → See shop cards with shield avatar, name, product count, follower count, "Visit Shop" button
+  - **All Products Section**: Browse infinite scroll grid (4 columns desktop, 2 mobile) → Load 20 products at a time → Click "Load More" to see more
+  - **Search**: Type in search bar (debounced 300ms) → See real-time results dropdown → Press Enter or click result → View filtered products → See "No results found" with suggestions if empty
+  - **Product Detail**: Click product → Open modal with image carousel (swipe through photos) → Tap image to zoom → View price, description, seller shop info card with shield avatar → Read delivery information → See customization options if any → Click "Add to Cart" or "Buy Now" → See "See the inspiration →" link to original Viz.It post if available
+- **Success criteria**:
+  - Marketplace loads with sample products and shops displayed correctly
+  - Search filters products by title, description, shop name, and tags in real-time
+  - Filter tabs change active state (pastel pink background) and update results
+  - Sort dropdown properly orders products by selected criteria
+  - Trending and Popular sections auto-refresh every 60 seconds with smooth fade transition
+  - Loading shimmer displays during refresh
+  - Product cards show correct image, title, price in pastel pink, clickable shop name, heart icon for wishlist
+  - Wishlist heart toggles fill state and persists across sessions
+  - Shop cards display shield-shaped avatar, stats, and pastel pink outline "Visit Shop" button
+  - Infinite scroll loads 20 products at a time, "Load More" button appears when more products available
+  - Product detail modal opens on card click, shows full carousel with navigation arrows and dot indicators
+  - Image zoom works on tap/click with visual feedback
+  - Shop info card in detail view is clickable and styled correctly
+  - "See the inspiration" link only appears when sourcePostId exists
+  - "Add to Cart" and "Buy Now" buttons have correct styling (outline vs filled pastel pink)
+  - Modal scrolls smoothly and close button works
+  - Responsive layout: 4 columns on desktop, 2 on mobile
+  - All hover states and transitions are smooth
+
 ## Edge Case Handling
 
 - **No Posts Available**: Show friendly empty state with "Welcome to Viz." message and suggestion to follow users
