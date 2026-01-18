@@ -19,9 +19,10 @@ interface User {
 
 interface HeaderProps {
   onNavigateToProfile?: () => void
+  onNavigateToSettings?: () => void
 }
 
-export function Header({ onNavigateToProfile }: HeaderProps) {
+export function Header({ onNavigateToProfile, onNavigateToSettings }: HeaderProps) {
   const [showRegistration, setShowRegistration] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
   const [currentUser, setCurrentUser] = useKV<User | null>("viz-current-user", null)
@@ -78,7 +79,7 @@ export function Header({ onNavigateToProfile }: HeaderProps) {
                 className="w-48 bg-background shadow-[0_4px_12px_rgba(255,182,193,0.2)]"
               >
                 <DropdownMenuItem onClick={handleProfileClick}>My Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onNavigateToSettings?.()}>Settings</DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>Log Out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

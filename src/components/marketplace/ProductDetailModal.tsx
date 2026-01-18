@@ -7,15 +7,51 @@ import { ShieldAvatar } from "@/components/ShieldAvatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { Product } from "@/components/VizLetPage"
 import { cn } from "@/lib/utils"
+import { useKV } from "@github/spark/hooks"
+import { toast } from "sonner"
 
 interface ProductDetailModalProps {
   product: Product
   onClose: () => void
+  onNavigateToSettings?: () => void
+  onVisitShop?: (shopId: string) => void
 }
 
-export function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
+export function ProductDetailModal({ product, onClose, onNavigateToSettings, onVisitShop }: ProductDetailModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isZoomed, setIsZoomed] = useState(false)
+  const [shippingAddresses] = useKV<any[]>("user-shipping-addresses", [])
+  const [paymentMethods] = useKV<any[]>("user-payment-methods", [])
+
+  const handleBuyNow = () => {
+    if (!shippingAddresses || shippingAddresses.length === 0) {
+      toast.error("Add a shipping address to continue", {
+        action: {
+          label: "Go to Settings",
+          onClick: () => {
+            onClose()
+            onNavigateToSettings?.()
+          }
+        }
+      })
+      return
+    }
+
+    if (!paymentMethods || paymentMethods.length === 0) {
+      toast.error("Add a payment method to continue", {
+        action: {
+          label: "Go to Settings",
+          onClick: () => {
+            onClose()
+            onNavigateToSettings?.()
+          }
+        }
+      })
+      return
+    }
+
+    toast.success("Proceeding to checkout...")
+  }
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % product.images.length)
@@ -119,7 +155,12 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
                   <ShieldAvatar src={product.shopAvatar || ""} alt={product.shopName} size="small" />
                   <div className="flex-1">
                     <p className="font-semibold text-foreground">{product.shopName}</p>
-                    <button className="text-sm text-primary hover:underline">Visit Shop</button>
+                    <button 
+                      className="text-sm text-primary hover:underline"
+                      onClick={() => onVisitShop?.(product.shopId)}
+                    >
+                      Visit Shop
+                    </button>
                   </div>
                 </div>
               </Card>
@@ -146,7 +187,11 @@ export function ProductDetailModal({ product, onClose }: ProductDetailModalProps
                 <Button variant="outline" size="lg" className="flex-1 border-primary text-primary hover:bg-primary/10">
                   Add to Cart
                 </Button>
-                <Button size="lg" className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
+                <Button 
+                  size="lg" 
+                  className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={handleBuyNow}
+                >
                   Buy Now
                 </Button>
               </div>

@@ -19,6 +19,7 @@ import {
 } from "@phosphor-icons/react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { ProductListingFlow } from "@/components/ProductListingFlow"
 
 interface Selection {
   id: string
@@ -50,58 +51,6 @@ interface MyVizItem {
     vizListCount: number
     vizItCount: number
   }
-}
-
-interface VizLetModalProps {
-  item: MyVizItem
-  isOpen: boolean
-  onClose: () => void
-  onConfirm: () => void
-}
-
-function VizLetModal({ item, isOpen, onClose, onConfirm }: VizLetModalProps) {
-  return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md">
-        <div className="relative -mt-6 mb-4 flex justify-center">
-          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-            <Stamp size={48} weight="fill" className="text-primary" />
-          </div>
-        </div>
-        <DialogHeader>
-          <DialogTitle className="text-center text-xl">Would you like to sell this on Viz.Let?</DialogTitle>
-        </DialogHeader>
-        <div className="py-4 text-center">
-          <p className="text-muted-foreground mb-4">
-            Transform your Viz.Listable into a product that others can purchase.
-          </p>
-          <div className="relative aspect-video rounded-lg overflow-hidden bg-muted mb-4">
-            <img
-              src={item.mediaUrl}
-              alt={item.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <p className="font-semibold text-foreground">{item.title}</p>
-        </div>
-        <DialogFooter className="flex-col gap-2 sm:flex-col">
-          <Button
-            className="w-full bg-primary hover:bg-accent text-primary-foreground"
-            onClick={onConfirm}
-          >
-            Yes, Viz.Let it!
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full text-muted-foreground hover:text-foreground"
-            onClick={onClose}
-          >
-            Not Now
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
 }
 
 interface MyVizDetailModalProps {
@@ -348,9 +297,8 @@ export function MyVizPage() {
     setVizLetItem(item)
   }
 
-  const handleVizLetConfirm = () => {
-    toast.success("Proceeding to Viz.Let listing form...")
-    setVizLetItem(null)
+  const handleVizLetConfirm = (item: MyVizItem) => {
+    setVizLetItem(item)
   }
 
   const handleEdit = (item: MyVizItem) => {
@@ -499,11 +447,10 @@ export function MyVizPage() {
       )}
 
       {vizLetItem && (
-        <VizLetModal
-          item={vizLetItem}
+        <ProductListingFlow
           isOpen={!!vizLetItem}
           onClose={() => setVizLetItem(null)}
-          onConfirm={handleVizLetConfirm}
+          vizItem={vizLetItem}
         />
       )}
     </div>

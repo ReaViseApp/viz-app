@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { ProductCard } from "@/components/marketplace/ProductCard"
 import { ShopCard } from "@/components/marketplace/ShopCard"
 import { ProductDetailModal } from "@/components/marketplace/ProductDetailModal"
+import { ShopPageModal } from "@/components/marketplace/ShopPageModal"
 import { useInitializeMarketplaceData } from "@/hooks/use-initialize-marketplace-data"
 import { cn } from "@/lib/utils"
 
@@ -40,7 +41,11 @@ export interface Shop {
 type FilterType = "all" | "trending" | "new" | "top-rated"
 type SortType = "newest" | "price-low" | "price-high" | "popular"
 
-export function VizLetPage() {
+interface VizLetPageProps {
+  onNavigateToSettings?: () => void
+}
+
+export function VizLetPage({ onNavigateToSettings }: VizLetPageProps = {}) {
   useInitializeMarketplaceData()
   
   const [products] = useKV<Product[]>("viz-let-products", [])
@@ -49,6 +54,7 @@ export function VizLetPage() {
   const [activeFilter, setActiveFilter] = useState<FilterType>("all")
   const [sortBy, setSortBy] = useState<SortType>("newest")
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [selectedShop, setSelectedShop] = useState<Shop | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [displayedProducts, setDisplayedProducts] = useState(20)
 
@@ -260,7 +266,13 @@ export function VizLetPage() {
             <ScrollArea className="w-full whitespace-nowrap">
               <div className="flex gap-4 pb-4">
                 {popularShops.length > 0 ? (
-                  popularShops.map((shop) => <ShopCard key={shop.id} shop={shop} />)
+                  popularShops.map((shop) => (
+                    <ShopCard 
+                      key={shop.id} 
+                      shop={shop} 
+                      onVisit={() => setSelectedShop(shop)}
+                    />
+                  ))
                 ) : (
                   <div className="w-full py-12 text-center text-muted-foreground">No shops yet</div>
                 )}
@@ -302,7 +314,26 @@ export function VizLetPage() {
       </div>
 
       {selectedProduct && (
-        <ProductDetailModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+        <ProductDetailModal 
+          product={selectedProduct} 
+          onClose={() => setSelectedProduct(null)} 
+          onNavigateToSettings={onNavigateToSettings}
+          onVisitShop={(shopId) => {
+            const shop = shops?.find(s => s.id === shopId)
+            if (shop) {
+              setSelectedProduct(null)
+              setSelectedShop(shop)
+            }
+          }}
+        />
+      )}
+
+      {selectedShop && (
+        <ShopPageModal
+          shop={selectedShop}
+          onClose={() => setSelectedShop(null)}
+          onNavigateToSettings={onNavigateToSettings}
+        />
       )}
     </div>
   )

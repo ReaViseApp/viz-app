@@ -9,9 +9,10 @@ import { ApprovalStatusPage } from "@/components/ApprovalStatusPage"
 import { VizListPage } from "@/components/VizListPage"
 import { ProfilePage } from "@/components/ProfilePage"
 import { VizLetPage } from "@/components/VizLetPage"
+import { SettingsPage } from "@/components/SettingsPage"
 import { Toaster } from "@/components/ui/sonner"
 
-type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile"
+type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile" | "settings"
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("feed")
@@ -19,11 +20,14 @@ function App() {
   return (
     <div className="min-h-screen bg-background">
       <Toaster />
-      <Header onNavigateToProfile={() => setCurrentPage("profile")} />
+      <Header 
+        onNavigateToProfile={() => setCurrentPage("profile")}
+        onNavigateToSettings={() => setCurrentPage("settings")}
+      />
       
       <div className="flex">
         <Sidebar 
-          activePage={currentPage}
+          activePage={currentPage === "settings" ? "feed" : currentPage}
           onPageChange={(page) => setCurrentPage(page as Page)}
         />
         
@@ -34,13 +38,14 @@ function App() {
             {currentPage === "approval" && <ApprovalStatusPage />}
             {currentPage === "viz-list" && <VizListPage />}
             {currentPage === "profile" && <ProfilePage />}
-            {currentPage === "viz-let" && <VizLetPage />}
+            {currentPage === "viz-let" && <VizLetPage onNavigateToSettings={() => setCurrentPage("settings")} />}
+            {currentPage === "settings" && <SettingsPage />}
           </div>
         </main>
       </div>
       
       <BottomNav 
-        activePage={currentPage}
+        activePage={currentPage === "settings" ? "feed" : currentPage}
         onPageChange={(page) => setCurrentPage(page as Page)}
       />
       <Footer />
