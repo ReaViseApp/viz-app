@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ShieldAvatar } from "@/components/ShieldAvatar"
 import { MyVizPage } from "@/components/MyVizPage"
+import { EditProfileModal } from "@/components/EditProfileModal"
 import { User, Sparkle, GridFour, Eye, ListChecks, PencilLine } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 
@@ -66,6 +67,7 @@ export function ProfilePage() {
   const [myVizItems] = useKV<any[]>("my-viz-items", [])
   const [isFollowing, setIsFollowing] = useState(false)
   const [hoveredPostId, setHoveredPostId] = useState<string | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   if (!currentUser) {
     return (
@@ -98,7 +100,7 @@ export function ProfilePage() {
   const isOwnProfile = true
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto">
+    <>
       <div className="mb-8 flex flex-col items-center text-center">
         <ShieldAvatar
           src={currentUser.avatar}
@@ -136,7 +138,11 @@ export function ProfilePage() {
 
         <div className="mt-6">
           {isOwnProfile ? (
-            <Button variant="outline" className="gap-2">
+            <Button 
+              variant="outline" 
+              className="gap-2"
+              onClick={() => setIsEditModalOpen(true)}
+            >
               <PencilLine size={16} weight="bold" />
               Edit Profile
             </Button>
@@ -154,6 +160,11 @@ export function ProfilePage() {
           )}
         </div>
       </div>
+
+      <EditProfileModal 
+        open={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+      />
 
       <Tabs defaultValue="all-viz-its" className="w-full">
         <TabsList className="w-full border-b border-border rounded-none h-auto p-0 bg-transparent mb-6 grid grid-cols-3">
@@ -419,6 +430,6 @@ export function ProfilePage() {
           </TabsContent>
         )}
       </Tabs>
-    </div>
+    </>
   )
 }
