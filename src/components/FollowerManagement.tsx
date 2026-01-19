@@ -10,6 +10,7 @@ import { Breadcrumb } from "@/components/Breadcrumb"
 import { Check, X, MagnifyingGlass, Users, UserPlus, Clock } from "@phosphor-icons/react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { useInitializeFollowerData } from "@/hooks/use-initialize-follower-data"
 
 interface FollowRequest {
   id: string
@@ -44,6 +45,8 @@ export function FollowerManagement() {
     []
   )
   const [searchQuery, setSearchQuery] = useState("")
+
+  useInitializeFollowerData()
 
   const pendingRequests = (followRequests || []).filter(req => req.status === "pending")
   
