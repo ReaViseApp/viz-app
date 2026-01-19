@@ -2,7 +2,6 @@ import { useEffect } from "react"
 import { useKV } from "@github/spark/hooks"
 import bijoufiLogo from "@/assets/images/bijoufi-logo.svg"
 import editorLogo from "@/assets/images/editorlogo-badge.svg"
-import dujourEdit from "@/assets/images/dujouredit.png"
 
 interface User {
   username: string
@@ -180,7 +179,7 @@ export function useInitializeBijoufi() {
           id: bijoufanjournalUser.vizBizId,
         },
         timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-        mediaUrl: dujourEdit,
+        mediaUrl: "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=800&h=800&fit=crop",
         caption: "Bijoux du jour Spring 26 Collection ✨ Discover our latest pieces that blend elegance with seasonal beauty 🌸💎 #BijouxDuJour #Spring26 #JewelryCollection",
         likes: 0,
         comments: [],
