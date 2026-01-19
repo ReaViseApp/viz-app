@@ -110,8 +110,35 @@ export function Feed() {
       })),
       ...(posts || []).map(p => ({ ...p, itemType: "post" as const }))
     ].sort((a, b) => {
-      const aTime = "publishedAt" in a ? new Date(a.publishedAt).getTime() : Date.now()
-      const bTime = "publishedAt" in b ? new Date(b.publishedAt).getTime() : Date.now()
+      let aTime: number
+      let bTime: number
+      
+      if ("publishedAt" in a) {
+        aTime = new Date(a.publishedAt).getTime()
+      } else if ("timestamp" in a && typeof a.timestamp === "string") {
+        try {
+          aTime = new Date(a.timestamp).getTime()
+          if (isNaN(aTime)) aTime = Date.now()
+        } catch {
+          aTime = Date.now()
+        }
+      } else {
+        aTime = Date.now()
+      }
+      
+      if ("publishedAt" in b) {
+        bTime = new Date(b.publishedAt).getTime()
+      } else if ("timestamp" in b && typeof b.timestamp === "string") {
+        try {
+          bTime = new Date(b.timestamp).getTime()
+          if (isNaN(bTime)) bTime = Date.now()
+        } catch {
+          bTime = Date.now()
+        }
+      } else {
+        bTime = Date.now()
+      }
+      
       return bTime - aTime
     })
 

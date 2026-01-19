@@ -146,11 +146,18 @@ export function useInitializeBijoufi() {
           avatar: bijoufiLogo,
           id: bijoufiUser.vizBizId,
         },
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
         mediaUrl: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&h=800&fit=crop",
         caption: "The Stacking Pendant - A golden symphony of form and nature 🍁✨ #jewelry #design #autumn #bijoufi",
-        likes: 0,
-        comments: [],
+        likes: 42,
+        comments: [
+          {
+            id: "c-bijoufi-1",
+            username: "bijoufanjournal",
+            text: "Absolutely stunning! The maple leaf detail is perfect 🍁",
+            avatar: editorLogo,
+          }
+        ],
         selections: [
           {
             id: "selection-pendant",
@@ -161,7 +168,7 @@ export function useInitializeBijoufi() {
             type: "approval"
           }
         ],
-        views: 0,
+        views: 127,
       }
 
       setPosts((current) => [...(current || []), mapleStackPost])
@@ -178,11 +185,18 @@ export function useInitializeBijoufi() {
           avatar: editorLogo,
           id: bijoufanjournalUser.vizBizId,
         },
-        timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+        timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
         mediaUrl: "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=800&h=800&fit=crop",
         caption: "Bijoux du jour Spring 26 Collection ✨ Discover our latest pieces that blend elegance with seasonal beauty 🌸💎 #BijouxDuJour #Spring26 #JewelryCollection",
-        likes: 0,
-        comments: [],
+        likes: 89,
+        comments: [
+          {
+            id: "c-bjj-1",
+            username: "bijoufi",
+            text: "Love the composition! Beautiful work 💕",
+            avatar: bijoufiLogo,
+          }
+        ],
         selections: [
           {
             id: "selection-ring",
@@ -209,7 +223,7 @@ export function useInitializeBijoufi() {
             type: "open"
           }
         ],
-        views: 0,
+        views: 234,
       }
 
       setPosts((current) => [...(current || []), dujourEditPost])
@@ -226,13 +240,13 @@ export function useInitializeBijoufi() {
           avatar: editorLogo,
           id: bijoufanjournalUser.vizBizId,
         },
-        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+        timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
         mediaUrl: "https://images.unsplash.com/photo-1544441893-675973e31985?w=800&h=800&fit=crop",
         caption: "Exploring minimalist aesthetics in modern design 📐✨ #minimalism #editorial #design",
-        likes: 0,
+        likes: 156,
         comments: [],
         selections: [],
-        views: 0,
+        views: 312,
       }
 
       setPosts((current) => [...(current || []), bijoufanjournalPost1])
@@ -249,10 +263,10 @@ export function useInitializeBijoufi() {
           avatar: editorLogo,
           id: bijoufanjournalUser.vizBizId,
         },
-        timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
         mediaUrl: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&h=800&fit=crop",
         caption: "Fashion meets function in the everyday 👗💫 #fashion #style #curation",
-        likes: 0,
+        likes: 203,
         comments: [],
         selections: [
           {
@@ -264,7 +278,7 @@ export function useInitializeBijoufi() {
             type: "open"
           }
         ],
-        views: 0,
+        views: 478,
       }
 
       setPosts((current) => [...(current || []), bijoufanjournalPost2])
@@ -281,13 +295,13 @@ export function useInitializeBijoufi() {
           avatar: editorLogo,
           id: bijoufanjournalUser.vizBizId,
         },
-        timestamp: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
+        timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
         mediaUrl: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=800&h=800&fit=crop",
         caption: "Coffee & contemplation - the perfect pairing ☕️🌿 #lifestyle #aesthetic #moments",
-        likes: 0,
+        likes: 178,
         comments: [],
         selections: [],
-        views: 0,
+        views: 289,
       }
 
       setPosts((current) => [...(current || []), bijoufanjournalPost3])
