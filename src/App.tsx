@@ -14,10 +14,12 @@ import { FollowerManagement } from "@/components/FollowerManagement"
 import { TermsOfServicePage, PrivacyPolicyPage, AboutPage, HelpPage, ContactPage } from "@/components/LegalPages"
 import { Toaster } from "@/components/ui/sonner"
 import { motion, AnimatePresence } from "framer-motion"
+import { useInitializeBijoufi } from "@/hooks/use-initialize-bijoufi"
 
 type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile" | "settings" | "manage-followers" | "terms" | "privacy" | "about" | "help" | "contact"
 
 function App() {
+  useInitializeBijoufi()
   const [currentPage, setCurrentPage] = useState<Page>("feed")
 
   useEffect(() => {
