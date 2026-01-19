@@ -306,6 +306,274 @@ export function useInitializeBijoufi() {
 
       setPosts((current) => [...(current || []), bijoufanjournalPost3])
     }
+
+    const bijoufiPost2Exists = posts.some(p => p.id === "bijoufi-post-2")
+    
+    if (!bijoufiPost2Exists) {
+      const bijoufiPost2: Post = {
+        id: "bijoufi-post-2",
+        authorId: bijoufiUser.vizBizId,
+        author: {
+          username: "bijoufi",
+          avatar: bijoufiLogo,
+          id: bijoufiUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        mediaUrl: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?w=800&h=800&fit=crop",
+        caption: "Delicate chains, bold statements 🔗✨ Each link tells a story #bijoufi #jewelry #craft",
+        likes: 67,
+        comments: [
+          {
+            id: "c-bijoufi-2-1",
+            username: "bijoufanjournal",
+            text: "The craftsmanship is incredible! 💎",
+            avatar: editorLogo,
+          }
+        ],
+        selections: [
+          {
+            id: "selection-chain-detail",
+            left: 25,
+            top: 35,
+            width: 35,
+            height: 30,
+            type: "approval"
+          }
+        ],
+        views: 198,
+      }
+
+      setPosts((current) => [...(current || []), bijoufiPost2])
+    }
+
+    const bijoufiPost3Exists = posts.some(p => p.id === "bijoufi-post-3")
+    
+    if (!bijoufiPost3Exists) {
+      const bijoufiPost3: Post = {
+        id: "bijoufi-post-3",
+        authorId: bijoufiUser.vizBizId,
+        author: {
+          username: "bijoufi",
+          avatar: bijoufiLogo,
+          id: bijoufiUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+        mediaUrl: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&h=800&fit=crop",
+        caption: "Gemstone magic in rose gold 💫 The perfect balance between elegance and edge #bijoufi #rosegold #gems",
+        likes: 94,
+        comments: [
+          {
+            id: "c-bijoufi-3-1",
+            username: "bijoufanjournal",
+            text: "This color palette is divine! 🌹",
+            avatar: editorLogo,
+          }
+        ],
+        selections: [
+          {
+            id: "selection-gemstone",
+            left: 38,
+            top: 40,
+            width: 24,
+            height: 28,
+            type: "open"
+          }
+        ],
+        views: 245,
+      }
+
+      setPosts((current) => [...(current || []), bijoufiPost3])
+    }
+
+    const bijoufiPost4Exists = posts.some(p => p.id === "bijoufi-post-4")
+    
+    if (!bijoufiPost4Exists) {
+      const bijoufiPost4: Post = {
+        id: "bijoufi-post-4",
+        authorId: bijoufiUser.vizBizId,
+        author: {
+          username: "bijoufi",
+          avatar: bijoufiLogo,
+          id: bijoufiUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+        mediaUrl: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&h=800&fit=crop",
+        caption: "Silver moonlight captured in metal 🌙 Contemporary designs for modern souls #sterlingsilver #bijoufi #jewelry",
+        likes: 81,
+        comments: [],
+        selections: [
+          {
+            id: "selection-silver-pendant",
+            left: 35,
+            top: 35,
+            width: 30,
+            height: 30,
+            type: "approval"
+          }
+        ],
+        views: 176,
+      }
+
+      setPosts((current) => [...(current || []), bijoufiPost4])
+    }
+
+    const bijoufanjournalPost4Exists = posts.some(p => p.id === "bijoufanjournal-post-4")
+    
+    if (!bijoufanjournalPost4Exists) {
+      const bijoufanjournalPost4: Post = {
+        id: "bijoufanjournal-post-4",
+        authorId: bijoufanjournalUser.vizBizId,
+        author: {
+          username: "bijoufanjournal",
+          avatar: editorLogo,
+          id: bijoufanjournalUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 18 * 60 * 60 * 1000).toISOString(),
+        mediaUrl: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&h=800&fit=crop",
+        caption: "Texture and light: the poetry of precious metals 🌟 #editorial #jewelry #artistry",
+        likes: 142,
+        comments: [
+          {
+            id: "c-bjj-4-1",
+            username: "bijoufi",
+            text: "Beautiful composition! Love how the light plays across the surface ✨",
+            avatar: bijoufiLogo,
+          }
+        ],
+        selections: [
+          {
+            id: "selection-texture-1",
+            left: 30,
+            top: 35,
+            width: 40,
+            height: 30,
+            type: "approval"
+          }
+        ],
+        views: 367,
+      }
+
+      setPosts((current) => [...(current || []), bijoufanjournalPost4])
+    }
+
+    const bijoufanjournalPost5Exists = posts.some(p => p.id === "bijoufanjournal-post-5")
+    
+    if (!bijoufanjournalPost5Exists) {
+      const bijoufanjournalPost5: Post = {
+        id: "bijoufanjournal-post-5",
+        authorId: bijoufanjournalUser.vizBizId,
+        author: {
+          username: "bijoufanjournal",
+          avatar: editorLogo,
+          id: bijoufanjournalUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        mediaUrl: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&h=800&fit=crop",
+        caption: "Pearls reimagined for the contemporary wardrobe 🤍 Classic meets modern #pearls #jewelry #timeless",
+        likes: 219,
+        comments: [
+          {
+            id: "c-bjj-5-1",
+            username: "bijoufi",
+            text: "Pearls never go out of style! 💕",
+            avatar: bijoufiLogo,
+          }
+        ],
+        selections: [
+          {
+            id: "selection-pearl-1",
+            left: 20,
+            top: 30,
+            width: 25,
+            height: 35,
+            type: "open"
+          },
+          {
+            id: "selection-pearl-2",
+            left: 55,
+            top: 35,
+            width: 30,
+            height: 30,
+            type: "open"
+          }
+        ],
+        views: 456,
+      }
+
+      setPosts((current) => [...(current || []), bijoufanjournalPost5])
+    }
+
+    const bijoufiPost5Exists = posts.some(p => p.id === "bijoufi-post-5")
+    
+    if (!bijoufiPost5Exists) {
+      const bijoufiPost5: Post = {
+        id: "bijoufi-post-5",
+        authorId: bijoufiUser.vizBizId,
+        author: {
+          username: "bijoufi",
+          avatar: bijoufiLogo,
+          id: bijoufiUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 14 * 60 * 60 * 1000).toISOString(),
+        mediaUrl: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&h=800&fit=crop",
+        caption: "Sculptural forms inspired by nature's geometry 🌿 When art meets adornment #bijoufi #sculptural #jewelry",
+        likes: 103,
+        comments: [],
+        selections: [
+          {
+            id: "selection-sculptural",
+            left: 28,
+            top: 32,
+            width: 44,
+            height: 36,
+            type: "approval"
+          }
+        ],
+        views: 221,
+      }
+
+      setPosts((current) => [...(current || []), bijoufiPost5])
+    }
+
+    const bijoufanjournalPost6Exists = posts.some(p => p.id === "bijoufanjournal-post-6")
+    
+    if (!bijoufanjournalPost6Exists) {
+      const bijoufanjournalPost6: Post = {
+        id: "bijoufanjournal-post-6",
+        authorId: bijoufanjournalUser.vizBizId,
+        author: {
+          username: "bijoufanjournal",
+          avatar: editorLogo,
+          id: bijoufanjournalUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 30 * 60 * 60 * 1000).toISOString(),
+        mediaUrl: "https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800&h=800&fit=crop",
+        caption: "Layering essentials for the season 🌸 Mix, match, and create your signature look #layering #style #editorial",
+        likes: 187,
+        comments: [],
+        selections: [
+          {
+            id: "selection-layer-1",
+            left: 15,
+            top: 25,
+            width: 30,
+            height: 40,
+            type: "open"
+          },
+          {
+            id: "selection-layer-2",
+            left: 55,
+            top: 30,
+            width: 30,
+            height: 35,
+            type: "open"
+          }
+        ],
+        views: 412,
+      }
+
+      setPosts((current) => [...(current || []), bijoufanjournalPost6])
+    }
   }, [users, posts, setPosts])
 
   useEffect(() => {
