@@ -196,6 +196,8 @@ export function useFabricCanvas(canvasId: string) {
 
     activeObject.clone().then((cloned: fabric.FabricObject) => {
       clipboard = cloned
+    }).catch((error) => {
+      console.error('Failed to copy object:', error)
     })
   }, [canvas])
 
@@ -228,6 +230,8 @@ export function useFabricCanvas(canvasId: string) {
       applyCustomControls(cloned)
       canvas.setActiveObject(cloned)
       canvas.requestRenderAll()
+    }).catch((error) => {
+      console.error('Failed to paste object:', error)
     })
   }, [canvas])
 

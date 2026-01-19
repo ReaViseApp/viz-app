@@ -136,18 +136,20 @@ export function CanvasEditorStep({
   useEffect(() => {
     if (!canvas) return
 
+    const isUserTyping = () => {
+      const activeElement = document.activeElement
+      return activeElement?.tagName === 'INPUT' || 
+             activeElement?.tagName === 'TEXTAREA' ||
+             (activeElement as HTMLElement)?.contentEditable === 'true'
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
       const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
       const isCtrlOrCmd = isMac ? e.metaKey : e.ctrlKey
 
-      // Prevent default for all shortcuts
+      // Prevent default for all shortcuts when not typing
       if (isCtrlOrCmd || e.key === 'Delete' || e.key === 'Backspace') {
-        const activeElement = document.activeElement
-        const isTyping = activeElement?.tagName === 'INPUT' || 
-                        activeElement?.tagName === 'TEXTAREA' ||
-                        (activeElement as HTMLElement)?.contentEditable === 'true'
-        
-        if (isTyping) return
+        if (isUserTyping()) return
       }
 
       // Copy: Ctrl+C / Cmd+C

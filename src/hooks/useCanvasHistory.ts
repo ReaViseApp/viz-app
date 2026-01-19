@@ -55,7 +55,8 @@ export function useCanvasHistory(canvas: fabric.Canvas | null) {
     
     try {
       const historyState = history[newIndex]
-      await canvas.loadFromJSON(historyState.state)
+      const stateObj = JSON.parse(historyState.state)
+      await canvas.loadFromJSON(stateObj)
       canvas.renderAll()
       setHistoryIndex(newIndex)
     } catch (error) {
@@ -76,7 +77,8 @@ export function useCanvasHistory(canvas: fabric.Canvas | null) {
     
     try {
       const historyState = history[newIndex]
-      await canvas.loadFromJSON(historyState.state)
+      const stateObj = JSON.parse(historyState.state)
+      await canvas.loadFromJSON(stateObj)
       canvas.renderAll()
       setHistoryIndex(newIndex)
     } catch (error) {

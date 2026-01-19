@@ -39,7 +39,6 @@ export function catmullRomSpline(
   tension: number = 0.5
 ): { x: number; y: number }[] {
   if (points.length < 2) return points
-  if (points.length === 2) return points
 
   const result: { x: number; y: number }[] = []
   const numSegments = 10 // Number of points between each control point

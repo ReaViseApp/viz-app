@@ -12,6 +12,10 @@ export class MagneticLasso {
   private sensitivity: number
   private searchRadius: number = 10
   private onComplete?: (path: fabric.Path) => void
+  
+  // Configuration constants
+  private static readonly LINES_TO_REMOVE_PER_POINT = 10
+  private static readonly INTERMEDIATE_POINT_SPACING = 5
 
   constructor(
     canvas: fabric.Canvas,
@@ -170,7 +174,9 @@ export class MagneticLasso {
     }
 
     // Remove lines associated with last point (could be multiple)
-    const linesToRemove = this.lines.length > 0 ? Math.min(10, this.lines.length) : 0
+    const linesToRemove = this.lines.length > 0 
+      ? Math.min(MagneticLasso.LINES_TO_REMOVE_PER_POINT, this.lines.length) 
+      : 0
     for (let i = 0; i < linesToRemove; i++) {
       const line = this.lines.pop()
       if (line) this.canvas.remove(line)
@@ -241,7 +247,7 @@ export class MagneticLasso {
     const distance = Math.sqrt(
       Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2)
     )
-    const numPoints = Math.max(2, Math.floor(distance / 5))
+    const numPoints = Math.max(2, Math.floor(distance / MagneticLasso.INTERMEDIATE_POINT_SPACING))
 
     for (let i = 1; i < numPoints; i++) {
       const t = i / numPoints
