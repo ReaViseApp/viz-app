@@ -11,6 +11,7 @@ import { ProfilePage } from "@/components/ProfilePage"
 import { VizLetPage } from "@/components/VizLetPage"
 import { SettingsPage } from "@/components/SettingsPage"
 import { FollowerManagement } from "@/components/FollowerManagement"
+import { TrendingPage } from "@/components/TrendingPage"
 import { TermsOfServicePage, PrivacyPolicyPage, AboutPage, HelpPage, ContactPage } from "@/components/LegalPages"
 import { Toaster } from "@/components/ui/sonner"
 import { motion, AnimatePresence } from "framer-motion"
@@ -19,7 +20,7 @@ import { useInitializeInteractions } from "@/hooks/use-initialize-interactions"
 import { useInitializeFollowerData } from "@/hooks/use-initialize-follower-data"
 import { useKV } from "@github/spark/hooks"
 
-type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile" | "settings" | "manage-followers" | "terms" | "privacy" | "about" | "help" | "contact"
+type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile" | "settings" | "manage-followers" | "trending" | "terms" | "privacy" | "about" | "help" | "contact"
 
 interface SearchResult {
   type: "hashtag" | "user" | "post"
@@ -47,10 +48,25 @@ function App() {
       }
     }
 
+    const handleSearchHashtag = (event: CustomEvent) => {
+      const hashtag = event.detail
+      setSearchFilter({
+        type: "hashtag",
+        id: hashtag,
+        label: `#${hashtag}`,
+        hashtag: hashtag
+      })
+      setCurrentPage("feed")
+    }
+
     window.addEventListener("hashchange", handleHashChange)
+    window.addEventListener("search-hashtag", handleSearchHashtag as EventListener)
     handleHashChange()
 
-    return () => window.removeEventListener("hashchange", handleHashChange)
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange)
+      window.removeEventListener("search-hashtag", handleSearchHashtag as EventListener)
+    }
   }, [])
 
   const handlePageChange = (page: Page | string) => {
@@ -88,6 +104,8 @@ function App() {
         return <SettingsPage />
       case "manage-followers":
         return <FollowerManagement />
+      case "trending":
+        return <TrendingPage />
       case "terms":
         return <TermsOfServicePage />
       case "privacy":
@@ -104,7 +122,7 @@ function App() {
   }
 
   const isLegalPage = ["terms", "privacy", "about", "help", "contact"].includes(currentPage)
-  const isFullWidthPage = ["manage-followers"].includes(currentPage)
+  const isFullWidthPage = ["manage-followers", "trending"].includes(currentPage)
 
   return (
     <div className="min-h-screen bg-background">
@@ -122,7 +140,7 @@ function App() {
       <div className="flex">
         {!isLegalPage && (
           <Sidebar 
-            activePage={(currentPage === "settings" || currentPage === "manage-followers" ? "feed" : currentPage) as any}
+            activePage={(currentPage === "settings" || currentPage === "manage-followers" || currentPage === "trending" ? "feed" : currentPage) as any}
             onPageChange={handlePageChange}
           />
         )}
@@ -146,7 +164,7 @@ function App() {
       
       {!isLegalPage && (
         <BottomNav 
-          activePage={(currentPage === "settings" || currentPage === "manage-followers" ? "feed" : currentPage) as any}
+          activePage={(currentPage === "settings" || currentPage === "manage-followers" || currentPage === "trending" ? "feed" : currentPage) as any}
           onPageChange={handlePageChange}
         />
       )}

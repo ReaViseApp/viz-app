@@ -1,9 +1,9 @@
 import { useState } from "react"
-import { House, PencilSimple, Stamp, ListChecks, Storefront } from "@phosphor-icons/react"
+import { House, PencilSimple, Stamp, ListChecks, Storefront, TrendUp } from "@phosphor-icons/react"
 import { useKV } from "@github/spark/hooks"
 import { cn } from "@/lib/utils"
 
-type SidebarPage = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile"
+type SidebarPage = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "trending" | "profile"
 
 interface SidebarProps {
   activePage?: SidebarPage
@@ -33,6 +33,7 @@ export function Sidebar({ activePage = "feed", onPageChange }: SidebarProps) {
 
   const navItems = [
     { id: "feed" as SidebarPage, label: "Home", icon: House, badge: 0 },
+    { id: "trending" as SidebarPage, label: "Trending", icon: TrendUp, badge: 0 },
     { id: "viz-it" as SidebarPage, label: "Viz.It", icon: PencilSimple, badge: 0 },
     { id: "approval" as SidebarPage, label: "Approval Status", icon: Stamp, badge: pendingIncomingCount },
     { id: "viz-list" as SidebarPage, label: "Viz.List", icon: ListChecks, badge: 0 },
