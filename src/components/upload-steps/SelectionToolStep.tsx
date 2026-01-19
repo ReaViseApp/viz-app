@@ -1,10 +1,18 @@
 import { useState, useRef, useEffect } from "react"
+import { fabric } from "fabric"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { X } from "@phosphor-icons/react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { useFabricCanvas } from "@/hooks/useFabricCanvas"
+import { useCanvasHistory } from "@/hooks/useCanvasHistory"
+import { fabricObjectToSelection } from "@/lib/fabric-utils"
+import { LassoToolbar, LassoTool } from "./SelectionTools/LassoToolbar"
+import { FreehandLasso } from "./SelectionTools/FreehandLasso"
+import { PolygonalLasso } from "./SelectionTools/PolygonalLasso"
+import { MagneticLasso } from "./SelectionTools/MagneticLasso"
 import type { MediaFile, Selection } from "../ContentUploadFlow"
 
 interface SelectionToolStepProps {
@@ -15,209 +23,311 @@ interface SelectionToolStepProps {
 
 export function SelectionToolStep({ media, onComplete, onBack }: SelectionToolStepProps) {
   const [selections, setSelections] = useState<Selection[]>([])
-  const [isDrawing, setIsDrawing] = useState(false)
-  const [currentPoints, setCurrentPoints] = useState<{ x: number; y: number }[]>([])
+  const [activeTool, setActiveTool] = useState<LassoTool>('freehand')
+  const [selectionObjects, setSelectionObjects] = useState<Map<string, fabric.Object>>(new Map())
+  
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 })
+  const freehandLassoRef = useRef<FreehandLasso | null>(null)
+  const polygonalLassoRef = useRef<PolygonalLasso | null>(null)
+  const magneticLassoRef = useRef<MagneticLasso | null>(null)
+  const backgroundImageRef = useRef<fabric.Image | null>(null)
 
+  const { canvas, isReady, addObject, removeSelected, getActiveObject } = useFabricCanvas(canvasRef, {
+    width: 800,
+    height: 600,
+  })
+
+  const { saveState, undo, redo, canUndo, canRedo } = useCanvasHistory(canvas)
+
+  // Initialize lasso tools when canvas is ready
   useEffect(() => {
-    const canvas = canvasRef.current
-    const container = containerRef.current
-    if (!canvas || !container) return
+    if (!canvas || !isReady) return
 
-    const img = new Image()
-    img.src = media.url
-    img.onload = () => {
+    freehandLassoRef.current = new FreehandLasso(canvas)
+    polygonalLassoRef.current = new PolygonalLasso(canvas)
+    magneticLassoRef.current = new MagneticLasso(canvas)
+
+    // Load background image
+    fabric.Image.fromURL(media.url, (img) => {
+      const container = containerRef.current
+      if (!container || !canvas) return
+
       const containerWidth = container.clientWidth
-      const scale = containerWidth / img.width
-      const scaledHeight = img.height * scale
+      const scale = Math.min(containerWidth / (img.width || 800), 600 / (img.height || 600))
+      
+      img.scale(scale)
+      img.set({
+        selectable: false,
+        evented: false,
+      })
 
-      canvas.width = containerWidth
-      canvas.height = scaledHeight
-      setImageDimensions({ width: containerWidth, height: scaledHeight })
+      canvas.setWidth(img.getScaledWidth())
+      canvas.setHeight(img.getScaledHeight())
+      canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas))
+      
+      backgroundImageRef.current = img
 
-      const ctx = canvas.getContext("2d")
-      if (ctx) {
-        ctx.drawImage(img, 0, 0, containerWidth, scaledHeight)
+      // Initialize magnetic lasso edge detection
+      if (magneticLassoRef.current) {
+        magneticLassoRef.current.initializeEdgeDetection()
+      }
+
+      saveState()
+    })
+  }, [canvas, isReady, media.url])
+
+  // Handle mouse/touch events for lasso tools
+  const handleCanvasMouseDown = (e: fabric.IEvent) => {
+    if (!canvas) return
+
+    const pointer = canvas.getPointer(e.e)
+    
+    if (activeTool === 'freehand' && freehandLassoRef.current) {
+      canvas.selection = false
+      canvas.forEachObject(obj => obj.set({ selectable: false }))
+      freehandLassoRef.current.startDrawing(pointer)
+    } else if (activeTool === 'polygonal' && polygonalLassoRef.current) {
+      canvas.selection = false
+      canvas.forEachObject(obj => obj.set({ selectable: false }))
+      if (!polygonalLassoRef.current.isActive()) {
+        polygonalLassoRef.current.startDrawing(pointer)
+      } else {
+        const shouldClose = polygonalLassoRef.current.addPoint(pointer)
+        if (shouldClose) {
+          finishPolygonalSelection()
+        }
+      }
+    } else if (activeTool === 'magnetic' && magneticLassoRef.current) {
+      canvas.selection = false
+      canvas.forEachObject(obj => obj.set({ selectable: false }))
+      if (!magneticLassoRef.current.isActive()) {
+        magneticLassoRef.current.startDrawing(pointer)
+      } else {
+        const shouldClose = magneticLassoRef.current.addPoint(pointer)
+        if (shouldClose) {
+          finishMagneticSelection()
+        }
       }
     }
-  }, [media.url])
+  }
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current
+  const handleCanvasMouseMove = (e: fabric.IEvent) => {
     if (!canvas) return
 
-    const rect = canvas.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-
-    setIsDrawing(true)
-    setCurrentPoints([{ x, y }])
+    const pointer = canvas.getPointer(e.e)
+    
+    if (activeTool === 'freehand' && freehandLassoRef.current?.isActive()) {
+      freehandLassoRef.current.continueDrawing(pointer)
+    } else if (activeTool === 'polygonal' && polygonalLassoRef.current?.isActive()) {
+      polygonalLassoRef.current.updatePreview(pointer)
+    }
   }
 
-  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    e.preventDefault()
-    const canvas = canvasRef.current
+  const handleCanvasMouseUp = () => {
+    if (activeTool === 'freehand' && freehandLassoRef.current?.isActive()) {
+      finishFreehandSelection()
+    }
+  }
+
+  const finishFreehandSelection = () => {
+    if (!freehandLassoRef.current || !canvas) return
+
+    const polygon = freehandLassoRef.current.finishDrawing()
+    if (polygon) {
+      addSelectionPolygon(polygon)
+    }
+    
+    // Re-enable selection
+    canvas.selection = true
+    canvas.forEachObject(obj => {
+      if (obj !== backgroundImageRef.current) {
+        obj.set({ selectable: true })
+      }
+    })
+  }
+
+  const finishPolygonalSelection = () => {
+    if (!polygonalLassoRef.current || !canvas) return
+
+    const polygon = polygonalLassoRef.current.finishDrawing()
+    if (polygon) {
+      addSelectionPolygon(polygon)
+    }
+    
+    // Re-enable selection
+    canvas.selection = true
+    canvas.forEachObject(obj => {
+      if (obj !== backgroundImageRef.current) {
+        obj.set({ selectable: true })
+      }
+    })
+  }
+
+  const finishMagneticSelection = () => {
+    if (!magneticLassoRef.current || !canvas) return
+
+    const polygon = magneticLassoRef.current.finishDrawing()
+    if (polygon) {
+      addSelectionPolygon(polygon)
+    }
+    
+    // Re-enable selection
+    canvas.selection = true
+    canvas.forEachObject(obj => {
+      if (obj !== backgroundImageRef.current) {
+        obj.set({ selectable: true })
+      }
+    })
+  }
+
+  const addSelectionPolygon = (polygon: fabric.Polygon) => {
     if (!canvas) return
 
-    const rect = canvas.getBoundingClientRect()
-    const touch = e.touches[0]
-    const x = touch.clientX - rect.left
-    const y = touch.clientY - rect.top
-
-    setIsDrawing(true)
-    setCurrentPoints([{ x, y }])
-  }
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return
-
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const rect = canvas.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-
-    setCurrentPoints(prev => [...prev, { x, y }])
+    const id = `sel-${Date.now()}`
+    polygon.set({ id } as any)
     
-    const ctx = canvas.getContext("2d")
-    if (ctx && currentPoints.length > 0) {
-      redrawCanvas()
-      
-      ctx.strokeStyle = "#FFB6C1"
-      ctx.lineWidth = 3
-      ctx.lineCap = "round"
-      ctx.lineJoin = "round"
-      ctx.beginPath()
-      ctx.moveTo(currentPoints[0].x, currentPoints[0].y)
-      currentPoints.forEach(point => {
-        ctx.lineTo(point.x, point.y)
-      })
-      ctx.lineTo(x, y)
-      ctx.stroke()
-    }
-  }
-
-  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    e.preventDefault()
-    if (!isDrawing) return
-
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const rect = canvas.getBoundingClientRect()
-    const touch = e.touches[0]
-    const x = touch.clientX - rect.left
-    const y = touch.clientY - rect.top
-
-    setCurrentPoints(prev => [...prev, { x, y }])
+    addObject(polygon)
     
-    const ctx = canvas.getContext("2d")
-    if (ctx && currentPoints.length > 0) {
-      redrawCanvas()
-      
-      ctx.strokeStyle = "#FFB6C1"
-      ctx.lineWidth = 3
-      ctx.lineCap = "round"
-      ctx.lineJoin = "round"
-      ctx.beginPath()
-      ctx.moveTo(currentPoints[0].x, currentPoints[0].y)
-      currentPoints.forEach(point => {
-        ctx.lineTo(point.x, point.y)
-      })
-      ctx.lineTo(x, y)
-      ctx.stroke()
-    }
-  }
-
-  const handleMouseUp = () => {
-    if (!isDrawing || currentPoints.length < 3) {
-      setIsDrawing(false)
-      setCurrentPoints([])
-      return
-    }
-
-    const xs = currentPoints.map(p => p.x)
-    const ys = currentPoints.map(p => p.y)
-    const minX = Math.min(...xs)
-    const maxX = Math.max(...xs)
-    const minY = Math.min(...ys)
-    const maxY = Math.max(...ys)
-
-    const newSelection: Selection = {
-      id: `sel-${Date.now()}`,
-      x: minX,
-      y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
-      points: currentPoints,
-      type: "open"
-    }
-
-    setSelections(prev => [...prev, newSelection])
-    setIsDrawing(false)
-    setCurrentPoints([])
-    redrawCanvas()
-  }
-
-  const handleTouchEnd = () => {
-    handleMouseUp()
-  }
-
-  const redrawCanvas = () => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-
-    const img = new Image()
-    img.src = media.url
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      
-      selections.forEach(selection => {
-        drawSelection(ctx, selection)
-      })
-    }
-  }
-
-  const drawSelection = (ctx: CanvasRenderingContext2D, selection: Selection) => {
-    const color = selection.type === "open" ? "#98D8AA" : "#FFDAB3"
+    const selection = fabricObjectToSelection(polygon, id, 'open')
+    setSelections(prev => [...prev, selection])
+    setSelectionObjects(prev => new Map(prev).set(id, polygon))
     
-    ctx.strokeStyle = color
-    ctx.lineWidth = 3
-    ctx.setLineDash([10, 5])
-    ctx.beginPath()
-    
-    if (selection.points.length > 0) {
-      ctx.moveTo(selection.points[0].x, selection.points[0].y)
-      selection.points.forEach(point => {
-        ctx.lineTo(point.x, point.y)
-      })
-      ctx.closePath()
-    } else {
-      ctx.rect(selection.x, selection.y, selection.width, selection.height)
-    }
-    
-    ctx.stroke()
-    ctx.setLineDash([])
+    saveState()
+    toast.success("Selection created")
   }
 
+  // Set up canvas event listeners
   useEffect(() => {
-    redrawCanvas()
-  }, [selections])
+    if (!canvas) return
+
+    canvas.on('mouse:down', handleCanvasMouseDown)
+    canvas.on('mouse:move', handleCanvasMouseMove)
+    canvas.on('mouse:up', handleCanvasMouseUp)
+
+    return () => {
+      canvas.off('mouse:down', handleCanvasMouseDown)
+      canvas.off('mouse:move', handleCanvasMouseMove)
+      canvas.off('mouse:up', handleCanvasMouseUp)
+    }
+  }, [canvas, activeTool])
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Undo: Ctrl+Z / Cmd+Z
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        undo()
+      }
+      
+      // Redo: Ctrl+Shift+Z / Cmd+Shift+Z
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) {
+        e.preventDefault()
+        redo()
+      }
+      
+      // Escape: Cancel current selection
+      if (e.key === 'Escape') {
+        if (freehandLassoRef.current?.isActive()) {
+          freehandLassoRef.current.cancel()
+        }
+        if (polygonalLassoRef.current?.isActive()) {
+          polygonalLassoRef.current.cancel()
+        }
+        if (magneticLassoRef.current?.isActive()) {
+          magneticLassoRef.current.cancel()
+        }
+        if (canvas) {
+          canvas.selection = true
+          canvas.forEachObject(obj => {
+            if (obj !== backgroundImageRef.current) {
+              obj.set({ selectable: true })
+            }
+          })
+        }
+      }
+      
+      // Backspace/Delete: Remove last point in polygonal or remove selected object
+      if (e.key === 'Backspace' || e.key === 'Delete') {
+        e.preventDefault()
+        if (polygonalLassoRef.current?.isActive()) {
+          polygonalLassoRef.current.removeLastPoint()
+        } else {
+          handleDeleteSelected()
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [canvas, undo, redo])
 
   const handleDeleteSelection = (id: string) => {
-    setSelections(prev => prev.filter(s => s.id !== id))
+    const obj = selectionObjects.get(id)
+    if (obj && canvas) {
+      canvas.remove(obj)
+      setSelections(prev => prev.filter(s => s.id !== id))
+      setSelectionObjects(prev => {
+        const newMap = new Map(prev)
+        newMap.delete(id)
+        return newMap
+      })
+      saveState()
+      toast.success("Selection deleted")
+    }
+  }
+
+  const handleDeleteSelected = () => {
+    const activeObj = getActiveObject()
+    if (activeObj) {
+      const id = (activeObj as any).id
+      if (id) {
+        handleDeleteSelection(id)
+      }
+    }
   }
 
   const handleTypeChange = (id: string, type: "open" | "approval") => {
     setSelections(prev =>
       prev.map(s => (s.id === id ? { ...s, type } : s))
     )
+    
+    const obj = selectionObjects.get(id)
+    if (obj) {
+      const color = type === "open" ? "#98D8AA" : "#FFDAB3"
+      const fillColor = type === "open" ? "rgba(152, 216, 170, 0.3)" : "rgba(255, 218, 179, 0.3)"
+      obj.set({
+        stroke: color,
+        fill: fillColor,
+      })
+      canvas?.renderAll()
+      saveState()
+    }
+  }
+
+  const handleToolChange = (tool: LassoTool) => {
+    // Cancel any active drawing
+    if (freehandLassoRef.current?.isActive()) {
+      freehandLassoRef.current.cancel()
+    }
+    if (polygonalLassoRef.current?.isActive()) {
+      polygonalLassoRef.current.cancel()
+    }
+    if (magneticLassoRef.current?.isActive()) {
+      magneticLassoRef.current.cancel()
+    }
+    
+    setActiveTool(tool)
+    
+    if (canvas) {
+      canvas.selection = true
+      canvas.forEachObject(obj => {
+        if (obj !== backgroundImageRef.current) {
+          obj.set({ selectable: true })
+        }
+      })
+    }
   }
 
   const handleComplete = () => {
@@ -232,23 +342,33 @@ export function SelectionToolStep({ media, onComplete, onBack }: SelectionToolSt
     <div className="space-y-6">
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-bold text-foreground">Draw Your Selections</h2>
-        <p className="text-muted-foreground">Draw on areas you want to make Viz.Listed</p>
+        <p className="text-muted-foreground">Use the lasso tools to select areas you want to make Viz.Listed</p>
+      </div>
+
+      <div className="flex justify-center">
+        <LassoToolbar
+          activeTool={activeTool}
+          onToolChange={handleToolChange}
+          canUndo={canUndo}
+          canRedo={canRedo}
+          onUndo={undo}
+          onRedo={redo}
+          onDeleteSelection={handleDeleteSelected}
+          hasSelection={!!getActiveObject()}
+        />
       </div>
 
       <Card>
         <CardContent className="p-4">
-          <div ref={containerRef} className="relative w-full">
+          <div ref={containerRef} className="relative w-full flex justify-center">
             <canvas
               ref={canvasRef}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              className="w-full cursor-crosshair border border-border rounded-lg"
-              style={{ touchAction: "none" }}
+              className="border border-border rounded-lg"
+              style={{ 
+                cursor: activeTool === 'freehand' ? 'crosshair' : 
+                        activeTool === 'polygonal' ? 'crosshair' : 
+                        activeTool === 'magnetic' ? 'crosshair' : 'default' 
+              }}
             />
           </div>
         </CardContent>
