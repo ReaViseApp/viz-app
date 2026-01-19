@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { useKV } from "@github/spark/hooks"
 import bijoufiLogo from "@/assets/images/bijoufi-logo.svg"
 import editorLogo from "@/assets/images/editorlogo-badge.svg"
+import dujourEdit from "@/assets/images/dujouredit.png"
 
 interface User {
   username: string
@@ -112,7 +113,7 @@ export function useInitializeBijoufi() {
         password: "journal123",
         vizBizId: "1234567890123457",
         avatar: editorLogo,
-        bio: "Editorial musings and creative explorations",
+        bio: "Bijoux Du Jour",
         createdAt: new Date().toISOString(),
       }
 
@@ -121,7 +122,7 @@ export function useInitializeBijoufi() {
       setUsers((current) =>
         (current || []).map(user =>
           user.username === "bijoufanjournal"
-            ? { ...user, avatar: editorLogo }
+            ? { ...user, avatar: editorLogo, bio: "Bijoux Du Jour" }
             : user
         )
       )
@@ -165,6 +166,54 @@ export function useInitializeBijoufi() {
       }
 
       setPosts((current) => [...(current || []), mapleStackPost])
+    }
+
+    const dujourEditPostExists = posts.some(p => p.id === "bijoufanjournal-dujour-spring26")
+    
+    if (!dujourEditPostExists) {
+      const dujourEditPost: Post = {
+        id: "bijoufanjournal-dujour-spring26",
+        authorId: bijoufanjournalUser.vizBizId,
+        author: {
+          username: "bijoufanjournal",
+          avatar: editorLogo,
+          id: bijoufanjournalUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
+        mediaUrl: dujourEdit,
+        caption: "Bijoux du jour Spring 26 Collection ✨ Discover our latest pieces that blend elegance with seasonal beauty 🌸💎 #BijouxDuJour #Spring26 #JewelryCollection",
+        likes: 0,
+        comments: [],
+        selections: [
+          {
+            id: "selection-ring",
+            left: 10,
+            top: 45,
+            width: 25,
+            height: 30,
+            type: "approval"
+          },
+          {
+            id: "selection-earrings",
+            left: 42,
+            top: 38,
+            width: 28,
+            height: 30,
+            type: "approval"
+          },
+          {
+            id: "selection-detail",
+            left: 75,
+            top: 42,
+            width: 20,
+            height: 35,
+            type: "open"
+          }
+        ],
+        views: 0,
+      }
+
+      setPosts((current) => [...(current || []), dujourEditPost])
     }
 
     const bijoufanjournalPost1Exists = posts.some(p => p.id === "bijoufanjournal-post-1")
