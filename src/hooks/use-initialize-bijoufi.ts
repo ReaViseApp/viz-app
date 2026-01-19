@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { useKV } from "@github/spark/hooks"
 import bijoufiLogo from "@/assets/images/bijoufi-logo.svg"
 import editorLogo from "@/assets/images/editorlogo-badge.svg"
+import { MediaItem } from "@/components/MediaCarousel"
 
 interface User {
   username: string
@@ -23,7 +24,8 @@ interface Post {
     id?: string
   }
   timestamp: string
-  mediaUrl: string
+  mediaUrl?: string
+  media?: MediaItem[]
   caption: string
   likes: number
   comments: Array<{
@@ -573,6 +575,124 @@ export function useInitializeBijoufi() {
       }
 
       setPosts((current) => [...(current || []), bijoufanjournalPost6])
+    }
+
+    const videoPostExists = posts.some(p => p.id === "bijoufi-video-post-1")
+    
+    if (!videoPostExists) {
+      const videoPost: Post = {
+        id: "bijoufi-video-post-1",
+        authorId: bijoufiUser.vizBizId,
+        author: {
+          username: "bijoufi",
+          avatar: bijoufiLogo,
+          id: bijoufiUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+        media: [
+          {
+            url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+            type: "video"
+          }
+        ],
+        caption: "Behind the scenes of our latest collection shoot 🎥✨ The process is just as beautiful as the result #BTS #jewelry #bijoufi",
+        likes: 145,
+        comments: [
+          {
+            id: "c-video-1",
+            username: "bijoufanjournal",
+            text: "This is mesmerizing! Love seeing the creative process 🎬",
+            avatar: editorLogo,
+          }
+        ],
+        selections: [],
+        views: 512,
+      }
+
+      setPosts((current) => [...(current || []), videoPost])
+    }
+
+    const carouselPostExists = posts.some(p => p.id === "bijoufanjournal-carousel-1")
+    
+    if (!carouselPostExists) {
+      const carouselPost: Post = {
+        id: "bijoufanjournal-carousel-1",
+        authorId: bijoufanjournalUser.vizBizId,
+        author: {
+          username: "bijoufanjournal",
+          avatar: editorLogo,
+          id: bijoufanjournalUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(),
+        media: [
+          {
+            url: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&h=800&fit=crop",
+            type: "image"
+          },
+          {
+            url: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&h=800&fit=crop",
+            type: "image"
+          },
+          {
+            url: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&h=800&fit=crop",
+            type: "image"
+          },
+          {
+            url: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&h=800&fit=crop",
+            type: "image"
+          }
+        ],
+        caption: "A journey through textures and light - swipe to explore the full collection 💎✨ #jewelry #carousel #editorial",
+        likes: 276,
+        comments: [
+          {
+            id: "c-carousel-1",
+            username: "bijoufi",
+            text: "Every piece tells a story! Beautiful curation 💕",
+            avatar: bijoufiLogo,
+          }
+        ],
+        selections: [],
+        views: 623,
+      }
+
+      setPosts((current) => [...(current || []), carouselPost])
+    }
+
+    const mixedCarouselExists = posts.some(p => p.id === "bijoufi-mixed-carousel-1")
+    
+    if (!mixedCarouselExists) {
+      const mixedCarousel: Post = {
+        id: "bijoufi-mixed-carousel-1",
+        authorId: bijoufiUser.vizBizId,
+        author: {
+          username: "bijoufi",
+          avatar: bijoufiLogo,
+          id: bijoufiUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
+        media: [
+          {
+            url: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=800&h=800&fit=crop",
+            type: "image"
+          },
+          {
+            url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+            type: "video"
+          },
+          {
+            url: "https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=800&h=800&fit=crop",
+            type: "image"
+          }
+        ],
+        caption: "From sketch to reality - a glimpse into our creative process 🎨✨ Mix of stills and motion to tell the full story #process #creativity #bijoufi",
+        likes: 198,
+        comments: [],
+        selections: [],
+        views: 445,
+      }
+
+      setPosts((current) => [...(current || []), mixedCarousel])
     }
   }, [users, posts, setPosts])
 

@@ -20,11 +20,31 @@ The app requires multiple interconnected views (feed, profile, lists, approval d
 - **Success criteria**: Unread count displays correctly, notifications grouped by type with appropriate icons, timestamps show relative time (e.g., "2h ago"), pink background on unread items, dropdown positioned correctly with shadow, notifications persist across sessions
 
 ### Instagram-Style Feed
-- **Functionality**: Infinite-scrolling vertical feed displaying posts with media, captions, likes, and comments
+- **Functionality**: Infinite-scrolling vertical feed displaying posts with media (images, videos, or carousels), captions, likes, and comments
 - **Purpose**: Core content discovery and consumption experience that feels familiar to social media users
 - **Trigger**: Landing on homepage or refreshing the feed
 - **Progression**: Load initial posts → User scrolls → Reach scroll threshold → Load more posts → Repeat
-- **Success criteria**: Smooth scrolling with no jank, posts load before user reaches bottom, images/videos display correctly
+- **Success criteria**: Smooth scrolling with no jank, posts load before user reaches bottom, images/videos display correctly, carousels show navigation arrows and dot indicators
+
+### Multi-Media Content Support (Videos & Carousels)
+- **Functionality**: Posts can contain single images, single videos, or carousels with multiple images/videos; videos autoplay on scroll (muted), carousels show navigation controls and indicators
+- **Purpose**: Allow creators to share richer, more diverse content types including motion and multi-image stories
+- **Trigger**: User uploads content to Viz.It or scrolls through feed
+- **Progression**: 
+  - Upload: Creator selects multiple files → System creates carousel → Preview shows all items → Publish
+  - Feed View: Post displays with carousel → User swipes/clicks arrows to navigate → Dot indicators show position → Videos autoplay when visible → Tap video to play/pause → Tap speaker icon to unmute
+- **Success criteria**: 
+  - Videos autoplay when 50% visible in viewport
+  - Videos pause when scrolled out of view
+  - Videos muted by default with unmute control
+  - Play/pause controls overlay on video
+  - Carousel navigation arrows visible on hover (desktop) or always visible (mobile)
+  - Dot indicators show current position (1-based)
+  - Current dot expands to indicate active slide
+  - Swipe gestures work on touch devices
+  - Mixed content carousels (images + videos) work seamlessly
+  - Video badge or carousel count badge visible on profile grid thumbnails
+  - Double-tap to like works on both videos and carousel items
 
 ### Interactive Visual Selection Overlays
 - **Functionality**: Semi-transparent colored borders pulse over quotable content areas; clicking opens selection popup with "Viz.List This" action

@@ -7,16 +7,18 @@ import { Badge } from "@/components/ui/badge"
 import { ShieldAvatar } from "@/components/ShieldAvatar"
 import { MyVizPage } from "@/components/MyVizPage"
 import { EditProfileModal } from "@/components/EditProfileModal"
-import { User, Sparkle, GridFour, Eye, ListChecks, PencilLine, Lock, Users, Globe, UserCircleGear } from "@phosphor-icons/react"
+import { MediaItem } from "@/components/MediaCarousel"
+import { User, Sparkle, GridFour, Eye, ListChecks, PencilLine, Lock, Users, Globe, UserCircleGear, Play, Images } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 
 interface Post {
   id: string
   authorId: string
-  mediaUrl: string
-  mediaType: "photo" | "video"
+  mediaUrl?: string
+  media?: MediaItem[]
+  mediaType?: "photo" | "video"
   caption: string
-  hashtags: string[]
+  hashtags?: string[]
   likes: number
   comments: number
   timestamp: string
@@ -306,32 +308,70 @@ export function ProfilePage() {
                     </div>
                   ) : (
                     <div className="relative w-full h-full">
-                      <img
-                        src={item.mediaUrl}
-                        alt={item.caption}
-                        className="w-full h-full object-cover"
-                      />
-                      {item.selections && item.selections.length > 0 && (
-                        <>
-                          {item.selections.map((selection: any) => (
-                            <div
-                              key={selection.id}
-                              className={cn(
-                                "absolute border-2 pointer-events-none",
-                                selection.type === "open" 
-                                  ? "border-mint/60" 
-                                  : "border-peach/60"
-                              )}
-                              style={{
-                                left: `${selection.left}%`,
-                                top: `${selection.top}%`,
-                                width: `${selection.width}%`,
-                                height: `${selection.height}%`,
-                              }}
-                            />
-                          ))}
-                        </>
-                      )}
+                      {(() => {
+                        const mediaItems = item.media || (item.mediaUrl ? [{ url: item.mediaUrl, type: "image" as const }] : [])
+                        const firstMedia = mediaItems[0]
+                        const hasMultiple = mediaItems.length > 1
+                        const hasVideo = mediaItems.some(m => m.type === "video")
+                        
+                        return (
+                          <>
+                            {firstMedia?.type === "video" ? (
+                              <video
+                                src={firstMedia.url}
+                                className="w-full h-full object-cover"
+                                muted
+                                playsInline
+                              />
+                            ) : (
+                              <img
+                                src={firstMedia?.url || item.mediaUrl || ""}
+                                alt={item.caption}
+                                className="w-full h-full object-cover"
+                              />
+                            )}
+                            
+                            {hasMultiple && (
+                              <div className="absolute top-2 right-2">
+                                <Badge className="bg-black/60 text-white flex items-center gap-1 text-xs">
+                                  <Images size={12} weight="fill" />
+                                  {mediaItems.length}
+                                </Badge>
+                              </div>
+                            )}
+                            
+                            {hasVideo && (
+                              <div className="absolute top-2 right-2">
+                                <Badge className="bg-black/60 text-white flex items-center gap-1 text-xs">
+                                  <Play size={12} weight="fill" />
+                                </Badge>
+                              </div>
+                            )}
+                            
+                            {item.selections && item.selections.length > 0 && (
+                              <>
+                                {item.selections.map((selection: any) => (
+                                  <div
+                                    key={selection.id}
+                                    className={cn(
+                                      "absolute border-2 pointer-events-none",
+                                      selection.type === "open" 
+                                        ? "border-mint/60" 
+                                        : "border-peach/60"
+                                    )}
+                                    style={{
+                                      left: `${selection.left}%`,
+                                      top: `${selection.top}%`,
+                                      width: `${selection.width}%`,
+                                      height: `${selection.height}%`,
+                                    }}
+                                  />
+                                ))}
+                              </>
+                            )}
+                          </>
+                        )
+                      })()}
                     </div>
                   )}
                   {hoveredPostId === item.id && (

@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ShieldAvatar } from "./ShieldAvatar"
 import { SelectionOverlay } from "./SelectionOverlay"
+import { MediaCarousel, MediaItem } from "./MediaCarousel"
 import { Heart, ChatCircle, PaperPlaneRight, ListChecks, DotsThree } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
@@ -34,7 +35,8 @@ interface Post {
     avatar: string
   }
   timestamp: string
-  mediaUrl: string
+  mediaUrl?: string
+  media?: MediaItem[]
   caption: string
   likes: number
   comments: Comment[]
@@ -133,6 +135,13 @@ export function PostCard({ post, onLike, onComment }: PostCardProps) {
   const displayedComments = showAllComments ? post.comments : post.comments.slice(-2)
   const hasMoreComments = post.comments.length > 2
 
+  const mediaItems: MediaItem[] = post.media || (post.mediaUrl ? [{ url: post.mediaUrl, type: "image" }] : [])
+  const primaryMediaUrl = mediaItems[0]?.url || post.mediaUrl || ""
+  
+  if (!primaryMediaUrl) {
+    return null
+  }
+
   return (
     <Card className="w-full max-w-[470px] mx-auto overflow-hidden border border-border shadow-sm">
       <div className="flex items-center justify-between p-4">
@@ -160,92 +169,99 @@ export function PostCard({ post, onLike, onComment }: PostCardProps) {
         </DropdownMenu>
       </div>
 
-      <div 
-        className="relative cursor-pointer"
-        onClick={handleDoubleTap}
-      >
-        <SelectionOverlay 
-          imageUrl={post.mediaUrl}
-          selections={post.selections}
-          authorUsername={post.author.username}
-          authorAvatar={post.author.avatar}
-          contentId={post.id}
-          onAddToList={(selectionId, selectionArea) => {
-            if (!currentUser) {
-              toast.error("Please log in to add to Viz.List")
-              return
-            }
-            
-            const newVizListItem: VizListItem = {
-              id: `vizlist-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-              contentId: post.id,
-              contentThumbnail: post.mediaUrl,
-              selectionArea: {
-                left: selectionArea.left,
-                top: selectionArea.top,
-                width: selectionArea.width,
-                height: selectionArea.height
-              },
-              creatorUsername: post.author.username,
-              creatorAvatar: post.author.avatar,
-              status: "approved",
-              addedDate: new Date().toISOString()
-            }
-            
-            setVizList((current) => [...(current || []), newVizListItem])
-          }}
-          onRequestApproval={(selectionId, selectionArea) => {
-            if (!currentUser) {
-              toast.error("Please log in to request approval")
-              return
-            }
-            
-            const userId = currentUser.id || currentUser.vizBizId || currentUser.username || "unknown"
-            
-            const newRequest: ApprovalRequest = {
-              id: `request-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-              requesterId: userId,
-              requesterUsername: currentUser.username,
-              requesterAvatar: currentUser.avatar,
-              creatorId: post.author.username,
-              creatorUsername: post.author.username,
-              creatorAvatar: post.author.avatar,
-              contentId: post.id,
-              contentThumbnail: post.mediaUrl,
-              selectionArea: {
-                left: selectionArea.left,
-                top: selectionArea.top,
-                width: selectionArea.width,
-                height: selectionArea.height
-              },
-              requestDate: new Date().toISOString(),
-              status: "pending"
-            }
-            
-            setApprovalRequests((current) => [...(current || []), newRequest])
-            
-            const newVizListItem: VizListItem = {
-              id: `vizlist-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-              contentId: post.id,
-              contentThumbnail: post.mediaUrl,
-              selectionArea: {
-                left: selectionArea.left,
-                top: selectionArea.top,
-                width: selectionArea.width,
-                height: selectionArea.height
-              },
-              creatorUsername: post.author.username,
-              creatorAvatar: post.author.avatar,
-              status: "pending",
-              addedDate: new Date().toISOString(),
-              approvalRequestId: newRequest.id
-            }
-            
-            setVizList((current) => [...(current || []), newVizListItem])
-          }}
-        />
+      <div className="relative">
+        {post.selections && post.selections.length > 0 ? (
+          <div onClick={handleDoubleTap}>
+            <SelectionOverlay 
+              imageUrl={primaryMediaUrl}
+              selections={post.selections}
+              authorUsername={post.author.username}
+              authorAvatar={post.author.avatar}
+              contentId={post.id}
+              onAddToList={(selectionId, selectionArea) => {
+                if (!currentUser) {
+                  toast.error("Please log in to add to Viz.List")
+                  return
+                }
+                
+                const newVizListItem: VizListItem = {
+                  id: `vizlist-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                  contentId: post.id,
+                  contentThumbnail: primaryMediaUrl,
+                  selectionArea: {
+                    left: selectionArea.left,
+                    top: selectionArea.top,
+                    width: selectionArea.width,
+                    height: selectionArea.height
+                  },
+                  creatorUsername: post.author.username,
+                  creatorAvatar: post.author.avatar,
+                  status: "approved",
+                  addedDate: new Date().toISOString()
+                }
+                
+                setVizList((current) => [...(current || []), newVizListItem])
+              }}
+              onRequestApproval={(selectionId, selectionArea) => {
+                if (!currentUser) {
+                  toast.error("Please log in to request approval")
+                  return
+                }
+                
+                const userId = currentUser.id || currentUser.vizBizId || currentUser.username || "unknown"
+                
+                const newRequest: ApprovalRequest = {
+                  id: `request-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                  requesterId: userId,
+                  requesterUsername: currentUser.username,
+                  requesterAvatar: currentUser.avatar,
+                  creatorId: post.author.username,
+                  creatorUsername: post.author.username,
+                  creatorAvatar: post.author.avatar,
+                  contentId: post.id,
+                  contentThumbnail: primaryMediaUrl,
+                  selectionArea: {
+                    left: selectionArea.left,
+                    top: selectionArea.top,
+                    width: selectionArea.width,
+                    height: selectionArea.height
+                  },
+                  requestDate: new Date().toISOString(),
+                  status: "pending"
+                }
+                
+                setApprovalRequests((current) => [...(current || []), newRequest])
+                
+                const newVizListItem: VizListItem = {
+                  id: `vizlist-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                  contentId: post.id,
+                  contentThumbnail: primaryMediaUrl,
+                  selectionArea: {
+                    left: selectionArea.left,
+                    top: selectionArea.top,
+                    width: selectionArea.width,
+                    height: selectionArea.height
+                  },
+                  creatorUsername: post.author.username,
+                  creatorAvatar: post.author.avatar,
+                  status: "pending",
+                  addedDate: new Date().toISOString(),
+                  approvalRequestId: newRequest.id
+                }
+                
+                setVizList((current) => [...(current || []), newVizListItem])
+              }}
+            />
+          </div>
+        ) : (
+          <MediaCarousel 
+            media={mediaItems}
+            onDoubleTap={handleDoubleTap}
+          />
+        )}
+        
         {showHeartAnimation && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
             <Heart 
               size={100} 
               weight="fill" 

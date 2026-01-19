@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react"
 import { PostCard } from "./PostCard"
 import { EditorialCard } from "./EditorialCard"
 import { EmptyState } from "./ErrorMessage"
+import { MediaItem } from "./MediaCarousel"
 import { useKV } from "@github/spark/hooks"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
@@ -17,7 +18,8 @@ interface Post {
     id?: string
   }
   timestamp: string
-  mediaUrl: string
+  mediaUrl?: string
+  media?: MediaItem[]
   caption: string
   likes: number
   comments: Array<{
