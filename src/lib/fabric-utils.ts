@@ -1,4 +1,4 @@
-import { fabric } from 'fabric'
+import * as fabric from 'fabric'
 
 /**
  * Initialize a Fabric.js canvas with default settings
@@ -37,7 +37,7 @@ export function initializeFabricCanvas(
  */
 export function pointsToFabricPolygon(
   points: { x: number; y: number }[],
-  options?: fabric.IPolygonOptions
+  options?: fabric.PolygonProps
 ): fabric.Polygon {
   const fabricPoints = points.map(p => new fabric.Point(p.x, p.y))
   

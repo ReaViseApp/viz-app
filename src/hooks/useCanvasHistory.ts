@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { fabric } from 'fabric'
+import * as fabric from 'fabric'
 import { serializeCanvas, deserializeCanvas } from '@/lib/fabric-utils'
 
 interface HistoryState {

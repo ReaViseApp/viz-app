@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { fabric } from 'fabric'
+import * as fabric from 'fabric'
 import { initializeFabricCanvas } from '@/lib/fabric-utils'
 
 interface UseFabricCanvasOptions {

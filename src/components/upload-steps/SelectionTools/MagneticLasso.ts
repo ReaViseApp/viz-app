@@ -1,4 +1,4 @@
-import { fabric } from 'fabric'
+import * as fabric from 'fabric'
 import { detectEdges, findNearestEdge, isNearStartPoint } from '@/lib/fabric-utils'
 
 export class MagneticLasso {

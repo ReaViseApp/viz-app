@@ -1,4 +1,4 @@
-import { fabric } from 'fabric'
+import * as fabric from 'fabric'
 import { smoothCurve, isNearStartPoint } from '@/lib/fabric-utils'
 
 export class FreehandLasso {

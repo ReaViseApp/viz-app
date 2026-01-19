@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { fabric } from "fabric"
+import * as fabric from "fabric"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
