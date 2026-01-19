@@ -1,5 +1,7 @@
 import { useEffect } from "react"
 import { useKV } from "@github/spark/hooks"
+import bijoufiLogo from "@/assets/images/bijoufi-logo.svg"
+import editorLogo from "@/assets/images/editorlogo-badge.svg"
 
 interface FollowRequest {
   id: string
@@ -21,6 +23,7 @@ interface Follower {
 
 export function useInitializeFollowerData() {
   const [currentUser] = useKV<any>("viz-current-user", null)
+  const [users] = useKV<any[]>("viz-users", [])
   const [followRequests, setFollowRequests] = useKV<FollowRequest[]>(
     `follow-requests-${currentUser?.id || currentUser?.vizBizId}`,
     []
@@ -33,6 +36,96 @@ export function useInitializeFollowerData() {
     `following-${currentUser?.id || currentUser?.vizBizId}`,
     []
   )
+  
+  const [bijoufiFollowers, setBijoufiFollowers] = useKV<Follower[]>(
+    "followers-1234567890123456",
+    []
+  )
+  const [bijoufiFollowing, setBijoufiFollowing] = useKV<Follower[]>(
+    "following-1234567890123456",
+    []
+  )
+  const [bijoufanjournalFollowers, setBijoufanjournalFollowers] = useKV<Follower[]>(
+    "followers-1234567890123457",
+    []
+  )
+  const [bijoufanjournalFollowing, setBijoufanjournalFollowing] = useKV<Follower[]>(
+    "following-1234567890123457",
+    []
+  )
+
+  useEffect(() => {
+    if (!users || users.length === 0) return
+    
+    const bijoufiUser = users.find((u: any) => u.username === "bijoufi")
+    const bijoufanjournalUser = users.find((u: any) => u.username === "bijoufanjournal")
+    
+    if (!bijoufiUser || !bijoufanjournalUser) return
+
+    const bijoufiFollowingBijoufanjournal = bijoufiFollowing?.some(
+      f => f.userId === bijoufanjournalUser.vizBizId
+    )
+    
+    if (!bijoufiFollowingBijoufanjournal) {
+      const bijoufanjournalFollower: Follower = {
+        id: "follower-bijoufi-to-bijoufanjournal",
+        userId: bijoufanjournalUser.vizBizId,
+        username: "bijoufanjournal",
+        avatar: editorLogo,
+        followedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+      }
+      
+      setBijoufiFollowing((current) => [...(current || []), bijoufanjournalFollower])
+    }
+
+    const bijoufanjournalHasBijoufiFollower = bijoufanjournalFollowers?.some(
+      f => f.userId === bijoufiUser.vizBizId
+    )
+    
+    if (!bijoufanjournalHasBijoufiFollower) {
+      const bijoufiAsFollower: Follower = {
+        id: "follower-bijoufi-following-bijoufanjournal",
+        userId: bijoufiUser.vizBizId,
+        username: "bijoufi",
+        avatar: bijoufiLogo,
+        followedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+      }
+      
+      setBijoufanjournalFollowers((current) => [...(current || []), bijoufiAsFollower])
+    }
+
+    const bijoufanjournalFollowingBijoufi = bijoufanjournalFollowing?.some(
+      f => f.userId === bijoufiUser.vizBizId
+    )
+    
+    if (!bijoufanjournalFollowingBijoufi) {
+      const bijoufiFollower: Follower = {
+        id: "follower-bijoufanjournal-to-bijoufi",
+        userId: bijoufiUser.vizBizId,
+        username: "bijoufi",
+        avatar: bijoufiLogo,
+        followedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+      }
+      
+      setBijoufanjournalFollowing((current) => [...(current || []), bijoufiFollower])
+    }
+
+    const bijoufiHasBijoufanjournalFollower = bijoufiFollowers?.some(
+      f => f.userId === bijoufanjournalUser.vizBizId
+    )
+    
+    if (!bijoufiHasBijoufanjournalFollower) {
+      const bijoufanjournalAsFollower: Follower = {
+        id: "follower-bijoufanjournal-following-bijoufi",
+        userId: bijoufanjournalUser.vizBizId,
+        username: "bijoufanjournal",
+        avatar: editorLogo,
+        followedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+      }
+      
+      setBijoufiFollowers((current) => [...(current || []), bijoufanjournalAsFollower])
+    }
+  }, [users, bijoufiFollowers, setBijoufiFollowers, bijoufiFollowing, setBijoufiFollowing, bijoufanjournalFollowers, setBijoufanjournalFollowers, bijoufanjournalFollowing, setBijoufanjournalFollowing])
 
   useEffect(() => {
     if (!currentUser) return
