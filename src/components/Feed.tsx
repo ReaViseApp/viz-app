@@ -35,6 +35,7 @@ interface Post {
     type: "open" | "approval"
   }>
   views?: number
+  likedBy?: string[]
 }
 
 interface Editorial {
@@ -248,16 +249,37 @@ export function Feed() {
   }, [loading, posts])
 
   const handleLike = (postId: string) => {
+    if (!currentUser) return
+
+    const userId = currentUser.id || currentUser.vizBizId || currentUser.username
+
     setPosts((currentPosts) =>
-      (currentPosts || []).map((post) =>
-        post.id === postId
-          ? { ...post, likes: post.likes + 1 }
-          : post
-      )
+      (currentPosts || []).map((post) => {
+        if (post.id !== postId) return post
+
+        const likedBy = post.likedBy || []
+        const hasLiked = likedBy.includes(userId)
+
+        if (hasLiked) {
+          return {
+            ...post,
+            likedBy: likedBy.filter(id => id !== userId),
+            likes: Math.max(0, post.likes - 1)
+          }
+        } else {
+          return {
+            ...post,
+            likedBy: [...likedBy, userId],
+            likes: post.likes + 1
+          }
+        }
+      })
     )
   }
 
   const handleComment = (postId: string, commentText: string) => {
+    if (!currentUser) return
+
     setPosts((currentPosts) =>
       (currentPosts || []).map((post) =>
         post.id === postId
@@ -267,9 +289,9 @@ export function Feed() {
                 ...post.comments,
                 {
                   id: `comment-${Date.now()}`,
-                  username: "current_user",
+                  username: currentUser.username,
                   text: commentText,
-                  avatar: "https://i.pravatar.cc/150?img=1",
+                  avatar: currentUser.avatar || "https://i.pravatar.cc/150?img=1",
                 },
               ],
             }

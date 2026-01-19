@@ -39,6 +39,7 @@ interface Post {
   likes: number
   comments: Comment[]
   selections: SelectionArea[]
+  likedBy?: string[]
 }
 
 interface PostCardProps {
@@ -85,18 +86,19 @@ interface VizListItem {
 }
 
 export function PostCard({ post, onLike, onComment }: PostCardProps) {
-  const [liked, setLiked] = useState(false)
+  const [currentUser] = useKV<{ id?: string; username: string; avatar: string; vizBizId?: string } | null>("viz-current-user", null)
+  const userId = currentUser?.id || currentUser?.vizBizId || currentUser?.username
+  const liked = post.likedBy?.includes(userId || "") || false
+  
   const [showAllComments, setShowAllComments] = useState(false)
   const [showFullCaption, setShowFullCaption] = useState(false)
   const [commentText, setCommentText] = useState("")
   const [showHeartAnimation, setShowHeartAnimation] = useState(false)
   const [lastTap, setLastTap] = useState(0)
   const [approvalRequests, setApprovalRequests] = useKV<ApprovalRequest[]>("approval-requests", [])
-  const [currentUser] = useKV<{ id?: string; username: string; avatar: string; vizBizId?: string } | null>("viz-current-user", null)
   const [vizList, setVizList] = useKV<VizListItem[]>("viz-list-items", [])
 
   const handleLike = () => {
-    setLiked(!liked)
     onLike?.(post.id)
   }
 
@@ -106,7 +108,6 @@ export function PostCard({ post, onLike, onComment }: PostCardProps) {
     
     if (now - lastTap < DOUBLE_TAP_DELAY) {
       if (!liked) {
-        setLiked(true)
         onLike?.(post.id)
       }
       setShowHeartAnimation(true)

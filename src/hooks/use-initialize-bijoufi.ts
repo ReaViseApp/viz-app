@@ -132,7 +132,8 @@ export function useInitializeBijoufi() {
     if (!users || !posts) return
 
     const bijoufiUser = users.find(u => u.username === "bijoufi")
-    if (!bijoufiUser) return
+    const bijoufanjournalUser = users.find(u => u.username === "bijoufanjournal")
+    if (!bijoufiUser || !bijoufanjournalUser) return
 
     const bijoufiPostExists = posts.some(p => p.id === "bijoufi-maplestack-post")
     
@@ -145,7 +146,7 @@ export function useInitializeBijoufi() {
           avatar: bijoufiLogo,
           id: bijoufiUser.vizBizId,
         },
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
         mediaUrl: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&h=800&fit=crop",
         caption: "The Stacking Pendant - A golden symphony of form and nature 🍁✨ #jewelry #design #autumn #bijoufi",
         likes: 0,
@@ -164,6 +165,84 @@ export function useInitializeBijoufi() {
       }
 
       setPosts((current) => [...(current || []), mapleStackPost])
+    }
+
+    const bijoufanjournalPost1Exists = posts.some(p => p.id === "bijoufanjournal-post-1")
+    
+    if (!bijoufanjournalPost1Exists) {
+      const bijoufanjournalPost1: Post = {
+        id: "bijoufanjournal-post-1",
+        authorId: bijoufanjournalUser.vizBizId,
+        author: {
+          username: "bijoufanjournal",
+          avatar: editorLogo,
+          id: bijoufanjournalUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+        mediaUrl: "https://images.unsplash.com/photo-1544441893-675973e31985?w=800&h=800&fit=crop",
+        caption: "Exploring minimalist aesthetics in modern design 📐✨ #minimalism #editorial #design",
+        likes: 0,
+        comments: [],
+        selections: [],
+        views: 0,
+      }
+
+      setPosts((current) => [...(current || []), bijoufanjournalPost1])
+    }
+
+    const bijoufanjournalPost2Exists = posts.some(p => p.id === "bijoufanjournal-post-2")
+    
+    if (!bijoufanjournalPost2Exists) {
+      const bijoufanjournalPost2: Post = {
+        id: "bijoufanjournal-post-2",
+        authorId: bijoufanjournalUser.vizBizId,
+        author: {
+          username: "bijoufanjournal",
+          avatar: editorLogo,
+          id: bijoufanjournalUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        mediaUrl: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&h=800&fit=crop",
+        caption: "Fashion meets function in the everyday 👗💫 #fashion #style #curation",
+        likes: 0,
+        comments: [],
+        selections: [
+          {
+            id: "selection-fashion-1",
+            left: 40,
+            top: 30,
+            width: 20,
+            height: 35,
+            type: "open"
+          }
+        ],
+        views: 0,
+      }
+
+      setPosts((current) => [...(current || []), bijoufanjournalPost2])
+    }
+
+    const bijoufanjournalPost3Exists = posts.some(p => p.id === "bijoufanjournal-post-3")
+    
+    if (!bijoufanjournalPost3Exists) {
+      const bijoufanjournalPost3: Post = {
+        id: "bijoufanjournal-post-3",
+        authorId: bijoufanjournalUser.vizBizId,
+        author: {
+          username: "bijoufanjournal",
+          avatar: editorLogo,
+          id: bijoufanjournalUser.vizBizId,
+        },
+        timestamp: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
+        mediaUrl: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=800&h=800&fit=crop",
+        caption: "Coffee & contemplation - the perfect pairing ☕️🌿 #lifestyle #aesthetic #moments",
+        likes: 0,
+        comments: [],
+        selections: [],
+        views: 0,
+      }
+
+      setPosts((current) => [...(current || []), bijoufanjournalPost3])
     }
   }, [users, posts, setPosts])
 

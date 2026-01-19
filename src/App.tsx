@@ -15,11 +15,13 @@ import { TermsOfServicePage, PrivacyPolicyPage, AboutPage, HelpPage, ContactPage
 import { Toaster } from "@/components/ui/sonner"
 import { motion, AnimatePresence } from "framer-motion"
 import { useInitializeBijoufi } from "@/hooks/use-initialize-bijoufi"
+import { useInitializeInteractions } from "@/hooks/use-initialize-interactions"
 
 type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile" | "settings" | "manage-followers" | "terms" | "privacy" | "about" | "help" | "contact"
 
 function App() {
   useInitializeBijoufi()
+  useInitializeInteractions()
   const [currentPage, setCurrentPage] = useState<Page>("feed")
 
   useEffect(() => {
