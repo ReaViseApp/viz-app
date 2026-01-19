@@ -305,7 +305,7 @@ export function CanvasEditorStep({
     if (!canvas) return
     const activeObject = canvas.getActiveObject()
     if (!activeObject) return
-    canvas.bringToFront(activeObject)
+    activeObject.bringToFront()
     canvas.renderAll()
     saveState()
     toast.success("Brought to front")
@@ -315,7 +315,7 @@ export function CanvasEditorStep({
     if (!canvas) return
     const activeObject = canvas.getActiveObject()
     if (!activeObject) return
-    canvas.bringForward(activeObject)
+    activeObject.bringForward()
     canvas.renderAll()
     saveState()
     toast.success("Brought forward")
@@ -325,7 +325,7 @@ export function CanvasEditorStep({
     if (!canvas) return
     const activeObject = canvas.getActiveObject()
     if (!activeObject) return
-    canvas.sendBackwards(activeObject)
+    activeObject.sendBackwards()
     canvas.renderAll()
     saveState()
     toast.success("Sent backward")
@@ -335,7 +335,7 @@ export function CanvasEditorStep({
     if (!canvas) return
     const activeObject = canvas.getActiveObject()
     if (!activeObject) return
-    canvas.sendToBack(activeObject)
+    activeObject.sendToBack()
     canvas.renderAll()
     saveState()
     toast.success("Sent to back")

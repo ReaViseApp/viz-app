@@ -144,7 +144,7 @@ export function SelectionToolStep({ media, onComplete, onBack }: SelectionToolSt
   useEffect(() => {
     if (!canvas) return
 
-    const handleMouseDown = (e: fabric.TMouseEvent) => {
+    const handleMouseDown = (e: any) => {
       if (!e.pointer) return
 
       const pointer = e.pointer
@@ -162,7 +162,7 @@ export function SelectionToolStep({ media, onComplete, onBack }: SelectionToolSt
       }
     }
 
-    const handleMouseMove = (e: fabric.TMouseEvent) => {
+    const handleMouseMove = (e: any) => {
       if (!e.pointer) return
 
       const pointer = e.pointer
