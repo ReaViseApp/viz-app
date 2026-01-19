@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 230" width="200" height="230">
+  <defs>
+    <clipPath id="shield-clip">
+      <path d="M 100 0 
+               L 170 20 
+               L 200 70 
+               L 200 140 
+               L 100 230 
+               L 0 140 
+               L 0 70 
+               L 30 20 Z"/>
+    </clipPath>
+  </defs>
+  
+  <rect width="200" height="230" fill="#FFB6C1" clip-path="url(#shield-clip)"/>
+  
+  <g clip-path="url(#shield-clip)">
+    <path d="M 100 30 
+             L 140 45 
+             L 165 80 
+             L 165 130 
+             L 100 200 
+             L 35 130 
+             L 35 80 
+             L 60 45 Z" 
+          fill="none" 
+          stroke="#1A1A1A" 
+          stroke-width="2"/>
+    
+    <path d="M 100 200 
+             L 100 130 
+             L 35 130" 
+          fill="#1A1A1A"/>
+    
+    <circle cx="100" cy="80" r="15" fill="#FFFFFF"/>
+    <circle cx="80" cy="110" r="12" fill="#FFFFFF" opacity="0.8"/>
+    <circle cx="120" cy="110" r="12" fill="#FFFFFF" opacity="0.8"/>
+    
+    <text x="100" y="175" 
+          font-family="Plus Jakarta Sans, sans-serif" 
+          font-size="24" 
+          font-weight="700" 
+          fill="#FFFFFF" 
+          text-anchor="middle">ED</text>
+  </g>
+</svg>
