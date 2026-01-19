@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Header } from "@/components/Header"
 import { Sidebar } from "@/components/Sidebar"
 import { BottomNav } from "@/components/BottomNav"
@@ -10,17 +10,37 @@ import { VizListPage } from "@/components/VizListPage"
 import { ProfilePage } from "@/components/ProfilePage"
 import { VizLetPage } from "@/components/VizLetPage"
 import { SettingsPage } from "@/components/SettingsPage"
+import { FollowerManagement } from "@/components/FollowerManagement"
 import { TermsOfServicePage, PrivacyPolicyPage, AboutPage, HelpPage, ContactPage } from "@/components/LegalPages"
 import { Toaster } from "@/components/ui/sonner"
 import { motion, AnimatePresence } from "framer-motion"
 
-type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile" | "settings" | "terms" | "privacy" | "about" | "help" | "contact"
+type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile" | "settings" | "manage-followers" | "terms" | "privacy" | "about" | "help" | "contact"
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("feed")
 
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1)
+      if (hash === "manage-followers") {
+        setCurrentPage("manage-followers")
+      }
+    }
+
+    window.addEventListener("hashchange", handleHashChange)
+    handleHashChange()
+
+    return () => window.removeEventListener("hashchange", handleHashChange)
+  }, [])
+
   const handlePageChange = (page: Page | string) => {
     setCurrentPage(page as Page)
+    if (page === "manage-followers") {
+      window.location.hash = "#manage-followers"
+    } else {
+      window.location.hash = ""
+    }
   }
 
   const renderPage = () => {
@@ -39,6 +59,8 @@ function App() {
         return <VizLetPage onNavigateToSettings={() => setCurrentPage("settings")} />
       case "settings":
         return <SettingsPage />
+      case "manage-followers":
+        return <FollowerManagement />
       case "terms":
         return <TermsOfServicePage />
       case "privacy":
@@ -55,6 +77,7 @@ function App() {
   }
 
   const isLegalPage = ["terms", "privacy", "about", "help", "contact"].includes(currentPage)
+  const isFullWidthPage = ["manage-followers"].includes(currentPage)
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,13 +91,13 @@ function App() {
       <div className="flex">
         {!isLegalPage && (
           <Sidebar 
-            activePage={(currentPage === "settings" ? "feed" : currentPage) as any}
+            activePage={(currentPage === "settings" || currentPage === "manage-followers" ? "feed" : currentPage) as any}
             onPageChange={handlePageChange}
           />
         )}
         
         <main className={`flex-1 ${!isLegalPage ? "lg:ml-64" : ""} pb-20 lg:pb-0`}>
-          <div className={`container ${!isLegalPage ? "max-w-[600px]" : "max-w-[900px]"} mx-auto px-4 py-8`}>
+          <div className={`container ${!isLegalPage && !isFullWidthPage ? "max-w-[600px]" : "max-w-[900px]"} mx-auto px-4 py-8`}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentPage}
@@ -92,7 +115,7 @@ function App() {
       
       {!isLegalPage && (
         <BottomNav 
-          activePage={(currentPage === "settings" ? "feed" : currentPage) as any}
+          activePage={(currentPage === "settings" || currentPage === "manage-followers" ? "feed" : currentPage) as any}
           onPageChange={handlePageChange}
         />
       )}

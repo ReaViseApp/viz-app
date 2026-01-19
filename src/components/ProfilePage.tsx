@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { ShieldAvatar } from "@/components/ShieldAvatar"
 import { MyVizPage } from "@/components/MyVizPage"
 import { EditProfileModal } from "@/components/EditProfileModal"
-import { User, Sparkle, GridFour, Eye, ListChecks, PencilLine, Lock, Users, Globe } from "@phosphor-icons/react"
+import { User, Sparkle, GridFour, Eye, ListChecks, PencilLine, Lock, Users, Globe, UserCircleGear } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 
 interface Post {
@@ -69,9 +69,15 @@ export function ProfilePage() {
     `profile-visibility-${currentUser?.id || currentUser?.vizBizId}`,
     "public"
   )
+  const [followRequests] = useKV<any[]>(
+    `follow-requests-${currentUser?.id || currentUser?.vizBizId}`,
+    []
+  )
   const [isFollowing, setIsFollowing] = useState(false)
   const [hoveredPostId, setHoveredPostId] = useState<string | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+
+  const pendingFollowRequests = (followRequests || []).filter(req => req.status === "pending")
 
   if (!currentUser) {
     return (
@@ -130,11 +136,11 @@ export function ProfilePage() {
             <p className="font-bold text-foreground">{userPosts.length + userEditorials.length}</p>
             <p className="text-muted-foreground">Posts</p>
           </div>
-          <div className="text-center">
+          <div className="text-center cursor-pointer hover:opacity-70 transition-opacity">
             <p className="font-bold text-foreground">{currentUser.followers || 247}</p>
             <p className="text-muted-foreground">Followers</p>
           </div>
-          <div className="text-center">
+          <div className="text-center cursor-pointer hover:opacity-70 transition-opacity">
             <p className="font-bold text-foreground">{currentUser.following || 183}</p>
             <p className="text-muted-foreground">Following</p>
           </div>
@@ -143,14 +149,29 @@ export function ProfilePage() {
         <div className="mt-6">
           {isOwnProfile ? (
             <div className="flex flex-col items-center gap-3">
-              <Button 
-                variant="outline" 
-                className="gap-2"
-                onClick={() => setIsEditModalOpen(true)}
-              >
-                <PencilLine size={16} weight="bold" />
-                Edit Profile
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  className="gap-2"
+                  onClick={() => setIsEditModalOpen(true)}
+                >
+                  <PencilLine size={16} weight="bold" />
+                  Edit Profile
+                </Button>
+                <Button
+                  variant="outline"
+                  className="gap-2 relative"
+                  onClick={() => window.location.hash = "#manage-followers"}
+                >
+                  <UserCircleGear size={16} weight="bold" />
+                  Manage Followers
+                  {pendingFollowRequests.length > 0 && (
+                    <Badge className="absolute -top-2 -right-2 bg-coral text-primary-foreground rounded-full w-5 h-5 p-0 flex items-center justify-center text-xs">
+                      {pendingFollowRequests.length}
+                    </Badge>
+                  )}
+                </Button>
+              </div>
               {profileVisibility && profileVisibility !== "public" && (
                 <Badge className={cn(
                   "gap-1.5 px-3 py-1",

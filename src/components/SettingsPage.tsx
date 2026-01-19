@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ShieldAvatar } from "@/components/ShieldAvatar"
+import { FollowerManagement } from "@/components/FollowerManagement"
 import { 
   Gear, 
   MapPin, 
@@ -129,10 +130,11 @@ export function SettingsPage() {
       </div>
 
       <Tabs defaultValue="buyer" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
           <TabsTrigger value="buyer">Buyer Info</TabsTrigger>
           <TabsTrigger value="seller">Seller Info</TabsTrigger>
           <TabsTrigger value="shop">My Shop</TabsTrigger>
+          <TabsTrigger value="followers">Followers</TabsTrigger>
           <TabsTrigger value="privacy">Privacy</TabsTrigger>
         </TabsList>
 
@@ -414,6 +416,10 @@ export function SettingsPage() {
               </div>
             )}
           </Card>
+        </TabsContent>
+
+        <TabsContent value="followers">
+          <FollowerManagement />
         </TabsContent>
 
         <TabsContent value="privacy" className="space-y-6">
