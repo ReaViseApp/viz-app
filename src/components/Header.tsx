@@ -7,7 +7,7 @@ import { LoginModal } from "./LoginModal"
 import { NotificationBell } from "./NotificationBell"
 import { useKV } from "@github/spark/hooks"
 import { toast } from "sonner"
-import { MagnifyingGlass, X } from "@phosphor-icons/react"
+import { MagnifyingGlass, X, Clock, TrendUp } from "@phosphor-icons/react"
 import { Input } from "@/components/ui/input"
 
 interface User {
@@ -59,20 +59,49 @@ export function Header({ onNavigateToProfile, onNavigateToSettings, onNavigateTo
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [showResults, setShowResults] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
   const [allUsers] = useKV<User[]>("viz-users", [])
   const [allPosts] = useKV<Post[]>("viz-posts", [])
+  const [searchHistory, setSearchHistory] = useKV<SearchResult[]>("viz-search-history", [])
   const searchRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setShowResults(false)
+        setShowSuggestions(false)
       }
     }
 
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
+
+  const getTrendingHashtags = (): SearchResult[] => {
+    const hashtagCount = new Map<string, number>()
+    
+    allPosts?.forEach(post => {
+      if (post.hashtags) {
+        post.hashtags.forEach(tag => {
+          const cleanTag = tag.replace("#", "").toLowerCase()
+          hashtagCount.set(cleanTag, (hashtagCount.get(cleanTag) || 0) + 1)
+        })
+      }
+    })
+
+    const sorted = Array.from(hashtagCount.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([tag, count]) => ({
+        type: "hashtag" as const,
+        id: tag,
+        label: `#${tag}`,
+        hashtag: tag,
+        count,
+      }))
+
+    return sorted
+  }
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -175,7 +204,16 @@ export function Header({ onNavigateToProfile, onNavigateToSettings, onNavigateTo
 
   const handleSearchResultClick = (result: SearchResult) => {
     setShowResults(false)
+    setShowSuggestions(false)
     setSearchQuery("")
+    
+    setSearchHistory((currentHistory) => {
+      const history = currentHistory || []
+      const filtered = history.filter(
+        item => !(item.type === result.type && item.id === result.id)
+      )
+      return [result, ...filtered].slice(0, 10)
+    })
     
     if (result.type === "hashtag") {
       const postsWithHashtag = allPosts?.filter(post => {
@@ -196,10 +234,17 @@ export function Header({ onNavigateToProfile, onNavigateToSettings, onNavigateTo
     }
   }
 
+  const clearSearchHistory = () => {
+    setSearchHistory([])
+    setShowSuggestions(false)
+    toast.success("Search history cleared")
+  }
+
   const clearSearch = () => {
     setSearchQuery("")
     setSearchResults([])
     setShowResults(false)
+    setShowSuggestions(false)
   }
 
   return (
@@ -225,7 +270,13 @@ export function Header({ onNavigateToProfile, onNavigateToSettings, onNavigateTo
                 placeholder="Search by @username or #hashtag"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => searchResults.length > 0 && setShowResults(true)}
+                onFocus={() => {
+                  if (searchResults.length > 0) {
+                    setShowResults(true)
+                  } else {
+                    setShowSuggestions(true)
+                  }
+                }}
                 className="pl-10 pr-10 h-9 bg-muted/50 border-border focus-visible:ring-primary text-sm"
               />
               {searchQuery && (
@@ -239,7 +290,7 @@ export function Header({ onNavigateToProfile, onNavigateToSettings, onNavigateTo
             </div>
 
             {showResults && searchResults.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50 max-h-[400px] overflow-y-auto">
                 {searchResults.map((result, index) => (
                   <button
                     key={`${result.type}-${result.id}-${index}`}
@@ -264,6 +315,100 @@ export function Header({ onNavigateToProfile, onNavigateToSettings, onNavigateTo
                     </div>
                   </button>
                 ))}
+              </div>
+            )}
+
+            {showSuggestions && !searchQuery && (!searchHistory || searchHistory.length === 0) && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50">
+                <div className="px-4 py-2 border-b border-border">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-foreground">🔥 Trending Hashtags</h3>
+                  </div>
+                </div>
+                {getTrendingHashtags().length > 0 ? (
+                  <div>
+                    {getTrendingHashtags().map((result, index) => (
+                      <button
+                        key={`trending-${result.id}-${index}`}
+                        onClick={() => handleSearchResultClick(result)}
+                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-muted transition-colors text-left"
+                      >
+                        <TrendUp size={18} className="text-primary flex-shrink-0" weight="bold" />
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <span className="text-primary font-bold text-sm">#</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-sm truncate">{result.label}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="px-4 py-6 text-center text-sm text-muted-foreground">
+                    No trending hashtags yet
+                  </div>
+                )}
+              </div>
+            )}
+
+            {showSuggestions && !searchQuery && searchHistory && searchHistory.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50 max-h-[400px] overflow-y-auto">
+                <div className="px-4 py-2 border-b border-border sticky top-0 bg-background z-10">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-foreground">Recent Searches</h3>
+                    <button
+                      onClick={clearSearchHistory}
+                      className="text-xs text-primary hover:text-accent transition-colors"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                </div>
+                {searchHistory.map((result, index) => (
+                  <button
+                    key={`history-${result.type}-${result.id}-${index}`}
+                    onClick={() => handleSearchResultClick(result)}
+                    className="w-full px-4 py-3 flex items-center gap-3 hover:bg-muted transition-colors text-left group"
+                  >
+                    <Clock size={18} className="text-muted-foreground flex-shrink-0" weight="bold" />
+                    {result.type === "user" && result.avatar && (
+                      <ShieldAvatar src={result.avatar} alt={result.username || ""} size="small" />
+                    )}
+                    {result.type === "hashtag" && (
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-primary font-bold text-sm">#</span>
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-sm truncate">
+                        {result.type === "user" ? `@${result.label}` : result.label}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+                
+                {getTrendingHashtags().length > 0 && (
+                  <>
+                    <div className="px-4 py-2 border-t border-border mt-2">
+                      <h3 className="text-sm font-semibold text-foreground">🔥 Trending Hashtags</h3>
+                    </div>
+                    {getTrendingHashtags().map((result, index) => (
+                      <button
+                        key={`trending-${result.id}-${index}`}
+                        onClick={() => handleSearchResultClick(result)}
+                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-muted transition-colors text-left"
+                      >
+                        <TrendUp size={18} className="text-primary flex-shrink-0" weight="bold" />
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <span className="text-primary font-bold text-sm">#</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-sm truncate">{result.label}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </>
+                )}
               </div>
             )}
           </div>
