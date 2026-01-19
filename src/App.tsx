@@ -17,14 +17,27 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useInitializeBijoufi } from "@/hooks/use-initialize-bijoufi"
 import { useInitializeInteractions } from "@/hooks/use-initialize-interactions"
 import { useInitializeFollowerData } from "@/hooks/use-initialize-follower-data"
+import { useKV } from "@github/spark/hooks"
 
 type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile" | "settings" | "manage-followers" | "terms" | "privacy" | "about" | "help" | "contact"
+
+interface SearchResult {
+  type: "hashtag" | "user" | "post"
+  id: string
+  label: string
+  username?: string
+  avatar?: string
+  hashtag?: string
+  postId?: string
+}
 
 function App() {
   useInitializeBijoufi()
   useInitializeInteractions()
   useInitializeFollowerData()
   const [currentPage, setCurrentPage] = useState<Page>("feed")
+  const [searchFilter, setSearchFilter] = useState<SearchResult | null>(null)
+  const [allPosts] = useKV<any[]>("viz-posts", [])
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -42,6 +55,7 @@ function App() {
 
   const handlePageChange = (page: Page | string) => {
     setCurrentPage(page as Page)
+    setSearchFilter(null)
     if (page === "manage-followers") {
       window.location.hash = "#manage-followers"
     } else {
@@ -49,10 +63,17 @@ function App() {
     }
   }
 
+  const handleSearch = (results: SearchResult[]) => {
+    if (results.length > 0) {
+      setSearchFilter(results[0])
+      setCurrentPage("feed")
+    }
+  }
+
   const renderPage = () => {
     switch (currentPage) {
       case "feed":
-        return <Feed />
+        return <Feed searchFilter={searchFilter} onClearSearch={() => setSearchFilter(null)} />
       case "viz-it":
         return <VizItPage />
       case "approval":
@@ -78,7 +99,7 @@ function App() {
       case "contact":
         return <ContactPage />
       default:
-        return <Feed />
+        return <Feed searchFilter={searchFilter} onClearSearch={() => setSearchFilter(null)} />
     }
   }
 
@@ -91,7 +112,11 @@ function App() {
       <Header 
         onNavigateToProfile={() => setCurrentPage("profile")}
         onNavigateToSettings={() => setCurrentPage("settings")}
-        onNavigateToHome={() => setCurrentPage("feed")}
+        onNavigateToHome={() => {
+          setCurrentPage("feed")
+          setSearchFilter(null)
+        }}
+        onSearch={handleSearch}
       />
       
       <div className="flex">

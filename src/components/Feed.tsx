@@ -7,7 +7,17 @@ import { useKV } from "@github/spark/hooks"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Sparkle, House } from "@phosphor-icons/react"
+import { Sparkle, House, X } from "@phosphor-icons/react"
+
+interface SearchResult {
+  type: "hashtag" | "user" | "post"
+  id: string
+  label: string
+  username?: string
+  avatar?: string
+  hashtag?: string
+  postId?: string
+}
 
 interface Post {
   id: string
@@ -55,7 +65,12 @@ interface Editorial {
 
 type FeedItem = (Post | Editorial) & { itemType: "post" | "editorial" }
 
-export function Feed() {
+interface FeedProps {
+  searchFilter?: SearchResult | null
+  onClearSearch?: () => void
+}
+
+export function Feed({ searchFilter = null, onClearSearch }: FeedProps = { searchFilter: null }) {
   const [posts, setPosts] = useKV<Post[]>("feed-posts", [])
   const [editorials] = useKV<Editorial[]>("viz-editorials", [])
   const [currentUser] = useKV<any>("viz-current-user", null)
@@ -102,6 +117,7 @@ export function Feed() {
   }
 
   const [visibleFeed, setVisibleFeed] = useState<FeedItem[]>([])
+  const [filteredFeed, setFilteredFeed] = useState<FeedItem[]>([])
 
   useEffect(() => {
     const combinedFeed: FeedItem[] = [
@@ -146,6 +162,39 @@ export function Feed() {
 
     filterByVisibility(combinedFeed).then(setVisibleFeed)
   }, [posts, editorials, currentUser])
+
+  useEffect(() => {
+    if (!searchFilter) {
+      setFilteredFeed(visibleFeed)
+      return
+    }
+
+    let filtered = visibleFeed
+
+    if (searchFilter.type === "hashtag" && searchFilter.hashtag) {
+      filtered = visibleFeed.filter(item => {
+        if (item.itemType === "post") {
+          const post = item as Post
+          const postHashtags = (post.caption?.match(/#\w+/g) || []).map(h => h.replace("#", "").toLowerCase())
+          return postHashtags.includes(searchFilter.hashtag!.toLowerCase())
+        }
+        return false
+      })
+    } else if (searchFilter.type === "user" && searchFilter.username) {
+      filtered = visibleFeed.filter(item => {
+        if (item.itemType === "post") {
+          const post = item as Post
+          return post.author?.username?.toLowerCase() === searchFilter.username!.toLowerCase()
+        } else if (item.itemType === "editorial") {
+          const editorial = item as Editorial
+          return editorial.authorUsername?.toLowerCase() === searchFilter.username!.toLowerCase()
+        }
+        return false
+      })
+    }
+
+    setFilteredFeed(filtered)
+  }, [visibleFeed, searchFilter])
 
   useEffect(() => {
     const checkNewPosts = setInterval(() => {
@@ -345,7 +394,31 @@ export function Feed() {
 
   return (
     <div className="w-full space-y-6 pb-12">
-      {showNewPostsBanner && (
+      {searchFilter && (
+        <div className="sticky top-4 z-10 mb-4">
+          <div className="bg-primary/10 border border-primary/20 rounded-lg px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="bg-primary text-primary-foreground">
+                {searchFilter.type === "hashtag" ? `#${searchFilter.hashtag}` : `@${searchFilter.username}`}
+              </Badge>
+              <span className="text-sm text-muted-foreground">
+                {filteredFeed.length} {filteredFeed.length === 1 ? "post" : "posts"} found
+              </span>
+            </div>
+            <Button
+              onClick={onClearSearch}
+              variant="ghost"
+              size="sm"
+              className="gap-2 h-8"
+            >
+              <X size={16} weight="bold" />
+              Clear
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {showNewPostsBanner && !searchFilter && (
         <div className="sticky top-4 z-10 flex justify-center mb-4">
           <Button
             onClick={handleLoadNewPosts}
@@ -357,21 +430,33 @@ export function Feed() {
         </div>
       )}
 
-      {visibleFeed.map((item) => (
-        item.itemType === "editorial" ? (
-          <EditorialCard
-            key={item.id}
-            editorial={item as Editorial}
-          />
-        ) : (
-          <PostCard
-            key={item.id}
-            post={item as Post}
-            onLike={handleLike}
-            onComment={handleComment}
-          />
-        )
-      ))}
+      {filteredFeed.length === 0 && searchFilter ? (
+        <EmptyState
+          icon={<House className="w-20 h-20" />}
+          title="No results found"
+          description={`No posts found for ${searchFilter.type === "hashtag" ? `#${searchFilter.hashtag}` : `@${searchFilter.username}`}`}
+          action={{
+            label: "Clear Search",
+            onClick: onClearSearch || (() => {})
+          }}
+        />
+      ) : (
+        filteredFeed.map((item) => (
+          item.itemType === "editorial" ? (
+            <EditorialCard
+              key={item.id}
+              editorial={item as Editorial}
+            />
+          ) : (
+            <PostCard
+              key={item.id}
+              post={item as Post}
+              onLike={handleLike}
+              onComment={handleComment}
+            />
+          )
+        ))
+      )}
 
       {loading && (
         <div className="w-full max-w-[470px] mx-auto space-y-4">
