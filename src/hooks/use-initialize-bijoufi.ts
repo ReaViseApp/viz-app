@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { useKV } from "@github/spark/hooks"
+import bijoufiLogo from "@/assets/images/bijoufi-logo.svg"
 
 interface User {
   username: string
@@ -25,11 +26,19 @@ export function useInitializeBijoufi() {
         email: "bijoufi@viz.app",
         password: "bijoufi123",
         vizBizId: "1234567890123456",
-        avatar: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA+gAAAPoCAYAAABNo9TkAAAACXBIWXMAAAsTAAALEwEAmpwYAAAKT2lDQ1BQaG90b3Nob3AgSUNDIHByb2ZpbGUAAHjanVNnVFPpFj333vRCS4iAlEtvUhUIIFJCi4AUkSYqIQkQSogMABBAAMgCgDEoIAoCAYGAQwgAAGCAgCAgAGBAAAEIBBAEAIAHAQAIAMhAADAgICcgOiAKSCAIAKBIABAYABAkAAA",
+        avatar: bijoufiLogo,
         createdAt: new Date().toISOString(),
       }
 
       setUsers((current) => [...(current || []), bijoufiUser])
+    } else {
+      setUsers((current) =>
+        (current || []).map(user =>
+          user.username === "bijoufi"
+            ? { ...user, avatar: bijoufiLogo }
+            : user
+        )
+      )
     }
   }, [users, setUsers])
 }

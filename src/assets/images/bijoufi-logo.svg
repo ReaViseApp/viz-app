@@ -1,0 +1,41 @@
+<svg width="1000" height="1000" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="shield-clip">
+      <path d="M 500 0 
+               L 850 100 
+               L 1000 350 
+               L 1000 700 
+               L 500 1000 
+               L 0 700 
+               L 0 350 
+               L 150 100 
+               Z"/>
+    </clipPath>
+  </defs>
+  
+  <!-- Pink background with shield clip -->
+  <rect width="1000" height="1000" fill="#FFC0CB" clip-path="url(#shield-clip)"/>
+  
+  <!-- Hand outline -->
+  <g transform="translate(500, 500) scale(2.5)">
+    <!-- Thumb -->
+    <ellipse cx="-80" cy="-20" rx="35" ry="65" fill="none" stroke="black" stroke-width="12"/>
+    
+    <!-- Index finger -->
+    <ellipse cx="-30" cy="-80" rx="28" ry="90" fill="none" stroke="black" stroke-width="12"/>
+    
+    <!-- Middle finger -->
+    <ellipse cx="20" cy="-90" rx="28" ry="95" fill="none" stroke="black" stroke-width="12"/>
+    
+    <!-- Ring finger -->
+    <ellipse cx="70" cy="-80" rx="28" ry="90" fill="none" stroke="black" stroke-width="12"/>
+    
+    <!-- Pinky -->
+    <ellipse cx="115" cy="-50" rx="25" ry="75" fill="none" stroke="black" stroke-width="12"/>
+  </g>
+  
+  <!-- BiJOUFi text -->
+  <text x="500" y="720" font-family="Arial, sans-serif" font-size="100" font-weight="bold" text-anchor="middle" fill="black">
+    BiJOUFi
+  </text>
+</svg>
