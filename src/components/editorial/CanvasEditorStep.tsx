@@ -39,6 +39,9 @@ import { useFabricCanvas } from "@/hooks/useFabricCanvas"
 import { useCanvasHistory } from "@/hooks/useCanvasHistory"
 import { serializeCanvas, deserializeCanvas, snapToAngle } from "@/lib/fabric-utils"
 
+// Module-scoped clipboard to avoid exposing on window object
+let canvasClipboard: fabric.Object | null = null
+
 interface CanvasEditorStepProps {
   selectedItems: VizListItem[]
   pages: EditorialPage[]
@@ -310,11 +313,14 @@ export function CanvasEditorStep({
     if (!canvas) return
 
     fabric.Image.fromURL(item.contentThumbnail, (img) => {
+      const imgWidth = img.width || 200
+      const imgHeight = img.height || 200
+      
       img.set({
         left: 150,
         top: 150,
-        scaleX: 200 / (img.width || 200),
-        scaleY: 200 / (img.height || 200),
+        scaleX: 200 / imgWidth,
+        scaleY: 200 / imgHeight,
       })
 
       addObject(img)
@@ -330,7 +336,7 @@ export function CanvasEditorStep({
     if (!activeObj) return
 
     activeObj.clone((cloned: fabric.Object) => {
-      (window as any)._clipboard = cloned
+      canvasClipboard = cloned
     })
     toast.success("Copied to clipboard")
   }
@@ -338,13 +344,12 @@ export function CanvasEditorStep({
   const handlePaste = () => {
     if (!canvas) return
 
-    const clipboard = (window as any)._clipboard
-    if (!clipboard) {
+    if (!canvasClipboard) {
       toast.error("Nothing to paste")
       return
     }
 
-    clipboard.clone((clonedObj: fabric.Object) => {
+    canvasClipboard.clone((clonedObj: fabric.Object) => {
       clonedObj.set({
         left: (clonedObj.left || 0) + 10,
         top: (clonedObj.top || 0) + 10,

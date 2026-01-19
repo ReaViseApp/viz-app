@@ -1,5 +1,5 @@
 import * as fabric from 'fabric'
-import { smoothCurve, isNearStartPoint } from '@/lib/fabric-utils'
+import { smoothCurve, isNearStartPoint, applyCustomControlStyles } from '@/lib/fabric-utils'
 
 export class FreehandLasso {
   private canvas: fabric.Canvas
@@ -78,11 +78,10 @@ export class FreehandLasso {
       selectable: true,
       hasControls: true,
       hasBorders: true,
-      cornerColor: '#FF69B4',
-      cornerSize: 10,
-      transparentCorners: false,
-      cornerStyle: 'circle' as 'circle',
     })
+
+    // Apply custom control styles
+    applyCustomControlStyles(polygon)
 
     this.reset()
     return polygon

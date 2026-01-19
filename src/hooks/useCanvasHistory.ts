@@ -37,10 +37,7 @@ export function useCanvasHistory(canvas: fabric.Canvas | null, maxHistorySize: n
         return newHistory
       })
       
-      setCurrentIndex(prev => {
-        const newIndex = Math.min(prev + 1, maxHistorySize - 1)
-        return newIndex
-      })
+      setCurrentIndex(prev => prev + 1)
     } finally {
       setIsSaving(false)
     }

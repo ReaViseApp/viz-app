@@ -1,5 +1,5 @@
 import * as fabric from 'fabric'
-import { detectEdges, findNearestEdge, isNearStartPoint } from '@/lib/fabric-utils'
+import { detectEdges, findNearestEdge, isNearStartPoint, applyCustomControlStyles } from '@/lib/fabric-utils'
 
 export class MagneticLasso {
   private canvas: fabric.Canvas
@@ -152,11 +152,10 @@ export class MagneticLasso {
       selectable: true,
       hasControls: true,
       hasBorders: true,
-      cornerColor: '#FF69B4',
-      cornerSize: 10,
-      transparentCorners: false,
-      cornerStyle: 'circle' as 'circle',
     })
+
+    // Apply custom control styles
+    applyCustomControlStyles(polygon)
 
     this.reset()
     return polygon

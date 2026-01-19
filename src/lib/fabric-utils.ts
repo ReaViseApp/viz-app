@@ -20,16 +20,20 @@ export function initializeFabricCanvas(
     ...options
   })
 
-  // Customize control handles to match app theme (pink/primary color)
-  fabric.Object.prototype.set({
+  return canvas
+}
+
+/**
+ * Apply custom control handle styles to a Fabric object
+ */
+export function applyCustomControlStyles(obj: fabric.Object) {
+  obj.set({
     borderColor: '#FFB6C1',
     cornerColor: '#FF69B4',
     cornerSize: 10,
     transparentCorners: false,
     cornerStyle: 'circle' as 'circle',
   })
-
-  return canvas
 }
 
 /**
@@ -41,7 +45,7 @@ export function pointsToFabricPolygon(
 ): fabric.Polygon {
   const fabricPoints = points.map(p => new fabric.Point(p.x, p.y))
   
-  return new fabric.Polygon(fabricPoints, {
+  const polygon = new fabric.Polygon(fabricPoints, {
     fill: 'rgba(152, 216, 170, 0.3)', // mint color with transparency
     stroke: '#98D8AA',
     strokeWidth: 3,
@@ -50,6 +54,11 @@ export function pointsToFabricPolygon(
     hasControls: true,
     ...options
   })
+
+  // Apply custom control styles
+  applyCustomControlStyles(polygon)
+  
+  return polygon
 }
 
 /**

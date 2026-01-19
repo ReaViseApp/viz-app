@@ -136,7 +136,7 @@ export function useFabricCanvas(
     if (!canvas) return
     const activeObject = canvas.getActiveObject()
     if (activeObject) {
-      canvas.sendBackwards(activeObject)
+      canvas.sendBackward(activeObject)
       canvas.renderAll()
     }
   }

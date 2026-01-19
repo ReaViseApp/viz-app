@@ -54,10 +54,13 @@ export function SelectionToolStep({ media, onComplete, onBack }: SelectionToolSt
       if (!container || !canvas) return
 
       const containerWidth = container.clientWidth
-      const scale = Math.min(containerWidth / (img.width || 800), 600 / (img.height || 600))
+      const imgWidth = img.width || 800
+      const imgHeight = img.height || 600
+      const scale = Math.min(containerWidth / imgWidth, 600 / imgHeight)
       
-      img.scale(scale)
       img.set({
+        scaleX: scale,
+        scaleY: scale,
         selectable: false,
         evented: false,
       })
