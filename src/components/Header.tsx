@@ -22,9 +22,15 @@ interface User {
 
 interface Post {
   id: string
-  userId: string
-  username: string
+  userId?: string
+  username?: string
+  author?: {
+    username: string
+    avatar: string
+    id?: string
+  }
   title?: string
+  caption?: string
   hashtags?: string[]
   [key: string]: any
 }
@@ -172,13 +178,19 @@ export function Header({ onNavigateToProfile, onNavigateToSettings, onNavigateTo
     setSearchQuery("")
     
     if (result.type === "hashtag") {
-      const postsWithHashtag = allPosts?.filter(post =>
-        post.hashtags?.some(tag => tag.replace("#", "").toLowerCase() === result.hashtag)
-      ) || []
+      const postsWithHashtag = allPosts?.filter(post => {
+        const postHashtags = post.hashtags || []
+        const captionHashtags = (post.caption?.match(/#\w+/g) || []).map(h => h.replace("#", ""))
+        const allHashtags = [...postHashtags, ...captionHashtags]
+        return allHashtags.some(tag => tag.replace("#", "").toLowerCase() === result.hashtag)
+      }) || []
       onSearch?.(postsWithHashtag.map(p => ({ ...result, postId: p.id })))
       toast.success(`Found ${postsWithHashtag.length} posts with #${result.hashtag}`)
     } else if (result.type === "user") {
-      const userPosts = allPosts?.filter(post => post.username === result.username) || []
+      const userPosts = allPosts?.filter(post => {
+        const postUsername = post.author?.username || post.username
+        return postUsername?.toLowerCase() === result.username?.toLowerCase()
+      }) || []
       onSearch?.([result])
       toast.success(`Viewing posts from @${result.username}`)
     }
