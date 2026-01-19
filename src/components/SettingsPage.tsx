@@ -18,7 +18,11 @@ import {
   Trash, 
   Pencil,
   Check,
-  Copy
+  Copy,
+  Lock,
+  Globe,
+  Users,
+  Eye
 } from "@phosphor-icons/react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -56,10 +60,14 @@ interface Shop {
 }
 
 export function SettingsPage() {
-  const [currentUser] = useKV<any>("viz-current-user", null)
+  const [currentUser, setCurrentUser] = useKV<any>("viz-current-user", null)
   const [shippingAddresses, setShippingAddresses] = useKV<ShippingAddress[]>("user-shipping-addresses", [])
   const [paymentMethods, setPaymentMethods] = useKV<PaymentMethod[]>("user-payment-methods", [])
   const [shops, setShops] = useKV<Shop[]>("viz-let-shops", [])
+  const [profileVisibility, setProfileVisibility] = useKV<"public" | "followers" | "private">(
+    `profile-visibility-${currentUser?.id || currentUser?.vizBizId}`,
+    "public"
+  )
 
   const [showAddressForm, setShowAddressForm] = useState(false)
   const [showPaymentForm, setShowPaymentForm] = useState(false)
@@ -78,6 +86,12 @@ export function SettingsPage() {
       navigator.clipboard.writeText(currentUser.vizBizId)
       toast.success("Viz.Biz ID copied to clipboard!")
     }
+  }
+
+  const handleVisibilityChange = (value: "public" | "followers" | "private") => {
+    setProfileVisibility(value)
+    setCurrentUser((prev: any) => prev ? { ...prev, profileVisibility: value } : prev)
+    toast.success("Profile visibility updated!")
   }
 
   const handleDeleteAddress = (id: string) => {
@@ -115,10 +129,11 @@ export function SettingsPage() {
       </div>
 
       <Tabs defaultValue="buyer" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
+        <TabsList className="grid w-full grid-cols-4 mb-6">
           <TabsTrigger value="buyer">Buyer Info</TabsTrigger>
           <TabsTrigger value="seller">Seller Info</TabsTrigger>
           <TabsTrigger value="shop">My Shop</TabsTrigger>
+          <TabsTrigger value="privacy">Privacy</TabsTrigger>
         </TabsList>
 
         <TabsContent value="buyer" className="space-y-6">
@@ -398,6 +413,151 @@ export function SettingsPage() {
                 </div>
               </div>
             )}
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="privacy" className="space-y-6">
+          <Card className="p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <Lock size={24} weight="fill" className="text-primary" />
+              <div>
+                <h2 className="text-xl font-semibold text-foreground">Profile Visibility</h2>
+                <p className="text-sm text-muted-foreground">Control who can see your posts</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <Card
+                className={cn(
+                  "p-4 cursor-pointer transition-all border-2",
+                  profileVisibility === "public"
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50"
+                )}
+                onClick={() => handleVisibilityChange("public")}
+              >
+                <div className="flex items-start gap-4">
+                  <div className={cn(
+                    "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+                    profileVisibility === "public" ? "bg-primary" : "bg-muted"
+                  )}>
+                    <Globe 
+                      size={20} 
+                      weight="fill" 
+                      className={profileVisibility === "public" ? "text-primary-foreground" : "text-muted-foreground"}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-semibold text-foreground">Public</h3>
+                      {profileVisibility === "public" && (
+                        <Badge className="bg-mint text-foreground">Active</Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Anyone on or off Viz. can see your posts, Viz.Edits, and profile
+                    </p>
+                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                      <Eye size={14} />
+                      <span>Maximum visibility</span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              <Card
+                className={cn(
+                  "p-4 cursor-pointer transition-all border-2",
+                  profileVisibility === "followers"
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50"
+                )}
+                onClick={() => handleVisibilityChange("followers")}
+              >
+                <div className="flex items-start gap-4">
+                  <div className={cn(
+                    "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+                    profileVisibility === "followers" ? "bg-primary" : "bg-muted"
+                  )}>
+                    <Users 
+                      size={20} 
+                      weight="fill" 
+                      className={profileVisibility === "followers" ? "text-primary-foreground" : "text-muted-foreground"}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-semibold text-foreground">Followers Only</h3>
+                      {profileVisibility === "followers" && (
+                        <Badge className="bg-mint text-foreground">Active</Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Only your approved followers can see your posts and Viz.Edits
+                    </p>
+                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                      <Eye size={14} />
+                      <span>Followers: {currentUser?.followers || 247}</span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              <Card
+                className={cn(
+                  "p-4 cursor-pointer transition-all border-2",
+                  profileVisibility === "private"
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50"
+                )}
+                onClick={() => handleVisibilityChange("private")}
+              >
+                <div className="flex items-start gap-4">
+                  <div className={cn(
+                    "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+                    profileVisibility === "private" ? "bg-primary" : "bg-muted"
+                  )}>
+                    <Lock 
+                      size={20} 
+                      weight="fill" 
+                      className={profileVisibility === "private" ? "text-primary-foreground" : "text-muted-foreground"}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="font-semibold text-foreground">Private</h3>
+                      {profileVisibility === "private" && (
+                        <Badge className="bg-mint text-foreground">Active</Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Only you can see your posts and Viz.Edits. Your profile is hidden from others
+                    </p>
+                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                      <Eye size={14} />
+                      <span>Hidden from everyone</span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Lock size={16} className="text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-foreground font-medium mb-1">About Privacy Settings</p>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    <li>• Your Viz.Let shop remains public regardless of this setting</li>
+                    <li>• Profile visibility only affects your feed content and profile page</li>
+                    <li>• Followers can be managed from your profile page</li>
+                    <li>• Changes take effect immediately</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </Card>
         </TabsContent>
       </Tabs>

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { ShieldAvatar } from "@/components/ShieldAvatar"
 import { MyVizPage } from "@/components/MyVizPage"
 import { EditProfileModal } from "@/components/EditProfileModal"
-import { User, Sparkle, GridFour, Eye, ListChecks, PencilLine } from "@phosphor-icons/react"
+import { User, Sparkle, GridFour, Eye, ListChecks, PencilLine, Lock, Users, Globe } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 
 interface Post {
@@ -60,11 +60,15 @@ interface VizListItem {
 }
 
 export function ProfilePage() {
-  const [currentUser] = useKV<{ id?: string; username: string; avatar: string; vizBizId?: string; bio?: string; followers?: number; following?: number } | null>("viz-current-user", null)
+  const [currentUser] = useKV<{ id?: string; username: string; avatar: string; vizBizId?: string; bio?: string; followers?: number; following?: number; profileVisibility?: "public" | "followers" | "private" } | null>("viz-current-user", null)
   const [posts] = useKV<Post[]>("feed-posts", [])
   const [editorials] = useKV<Editorial[]>("viz-editorials", [])
   const [vizList] = useKV<VizListItem[]>("viz-list-items", [])
   const [myVizItems] = useKV<any[]>("my-viz-items", [])
+  const [profileVisibility] = useKV<"public" | "followers" | "private">(
+    `profile-visibility-${currentUser?.id || currentUser?.vizBizId}`,
+    "public"
+  )
   const [isFollowing, setIsFollowing] = useState(false)
   const [hoveredPostId, setHoveredPostId] = useState<string | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -138,14 +142,27 @@ export function ProfilePage() {
 
         <div className="mt-6">
           {isOwnProfile ? (
-            <Button 
-              variant="outline" 
-              className="gap-2"
-              onClick={() => setIsEditModalOpen(true)}
-            >
-              <PencilLine size={16} weight="bold" />
-              Edit Profile
-            </Button>
+            <div className="flex flex-col items-center gap-3">
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => setIsEditModalOpen(true)}
+              >
+                <PencilLine size={16} weight="bold" />
+                Edit Profile
+              </Button>
+              {profileVisibility && profileVisibility !== "public" && (
+                <Badge className={cn(
+                  "gap-1.5 px-3 py-1",
+                  profileVisibility === "followers" && "bg-peach text-foreground",
+                  profileVisibility === "private" && "bg-accent text-accent-foreground"
+                )}>
+                  {profileVisibility === "followers" && <Users size={14} weight="fill" />}
+                  {profileVisibility === "private" && <Lock size={14} weight="fill" />}
+                  {profileVisibility === "followers" ? "Followers Only" : "Private Profile"}
+                </Badge>
+              )}
+            </div>
           ) : (
             <Button
               className={cn(

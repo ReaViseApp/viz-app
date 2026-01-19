@@ -10,9 +10,11 @@ import { Sparkle, House } from "@phosphor-icons/react"
 
 interface Post {
   id: string
+  authorId?: string
   author: {
     username: string
     avatar: string
+    id?: string
   }
   timestamp: string
   mediaUrl: string
@@ -53,6 +55,7 @@ type FeedItem = (Post | Editorial) & { itemType: "post" | "editorial" }
 export function Feed() {
   const [posts, setPosts] = useKV<Post[]>("feed-posts", [])
   const [editorials] = useKV<Editorial[]>("viz-editorials", [])
+  const [currentUser] = useKV<any>("viz-current-user", null)
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
   const observerTarget = useRef<HTMLDivElement>(null)
@@ -60,18 +63,59 @@ export function Feed() {
   const [showNewPostsBanner, setShowNewPostsBanner] = useState(false)
   const [lastFeedCheck, setLastFeedCheck] = useState(Date.now())
 
-  const combinedFeed: FeedItem[] = [
-    ...(editorials || []).map(e => ({ 
-      ...e, 
-      itemType: "editorial" as const,
-      quotedContentCount: e.assetReferences?.length || 0
-    })),
-    ...(posts || []).map(p => ({ ...p, itemType: "post" as const }))
-  ].sort((a, b) => {
-    const aTime = "publishedAt" in a ? new Date(a.publishedAt).getTime() : Date.now()
-    const bTime = "publishedAt" in b ? new Date(b.publishedAt).getTime() : Date.now()
-    return bTime - aTime
-  })
+  const filterByVisibility = async (items: FeedItem[]): Promise<FeedItem[]> => {
+    const filteredItems: FeedItem[] = []
+    
+    for (const item of items) {
+      const authorId = item.itemType === "editorial" ? (item as Editorial).authorId : (item as Post).author?.id || (item as Post).authorId
+      
+      if (!authorId) {
+        filteredItems.push(item)
+        continue
+      }
+
+      if (currentUser && (currentUser.id === authorId || currentUser.vizBizId === authorId || currentUser.username === authorId)) {
+        filteredItems.push(item)
+        continue
+      }
+
+      try {
+        const visibility = await window.spark.kv.get<string>(`profile-visibility-${authorId}`)
+        
+        if (!visibility || visibility === "public") {
+          filteredItems.push(item)
+        } else if (visibility === "followers") {
+          const isFollowing = await window.spark.kv.get<boolean>(`is-following-${currentUser?.id || currentUser?.vizBizId}-${authorId}`)
+          if (isFollowing) {
+            filteredItems.push(item)
+          }
+        }
+      } catch (error) {
+        filteredItems.push(item)
+      }
+    }
+    
+    return filteredItems
+  }
+
+  const [visibleFeed, setVisibleFeed] = useState<FeedItem[]>([])
+
+  useEffect(() => {
+    const combinedFeed: FeedItem[] = [
+      ...(editorials || []).map(e => ({ 
+        ...e, 
+        itemType: "editorial" as const,
+        quotedContentCount: e.assetReferences?.length || 0
+      })),
+      ...(posts || []).map(p => ({ ...p, itemType: "post" as const }))
+    ].sort((a, b) => {
+      const aTime = "publishedAt" in a ? new Date(a.publishedAt).getTime() : Date.now()
+      const bTime = "publishedAt" in b ? new Date(b.publishedAt).getTime() : Date.now()
+      return bTime - aTime
+    })
+
+    filterByVisibility(combinedFeed).then(setVisibleFeed)
+  }, [posts, editorials, currentUser])
 
   useEffect(() => {
     const checkNewPosts = setInterval(() => {
@@ -262,7 +306,7 @@ export function Feed() {
         </div>
       )}
 
-      {combinedFeed.map((item) => (
+      {visibleFeed.map((item) => (
         item.itemType === "editorial" ? (
           <EditorialCard
             key={item.id}
