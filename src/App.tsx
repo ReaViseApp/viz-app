@@ -13,6 +13,7 @@ import { SettingsPage } from "@/components/SettingsPage"
 import { FollowerManagement } from "@/components/FollowerManagement"
 import { TrendingPage } from "@/components/TrendingPage"
 import { TermsOfServicePage, PrivacyPolicyPage, AboutPage, HelpPage, ContactPage } from "@/components/LegalPages"
+import { Landing } from "@/pages/Landing"
 import { Toaster } from "@/components/ui/sonner"
 import { motion, AnimatePresence } from "framer-motion"
 import { useInitializeBijoufi } from "@/hooks/use-initialize-bijoufi"
@@ -20,7 +21,7 @@ import { useInitializeInteractions } from "@/hooks/use-initialize-interactions"
 import { useInitializeFollowerData } from "@/hooks/use-initialize-follower-data"
 import { useKV } from "@github/spark/hooks"
 
-type Page = "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile" | "settings" | "manage-followers" | "trending" | "terms" | "privacy" | "about" | "help" | "contact"
+type Page = "landing" | "feed" | "viz-it" | "approval" | "viz-list" | "viz-let" | "profile" | "settings" | "manage-followers" | "trending" | "terms" | "privacy" | "about" | "help" | "contact"
 
 interface SearchResult {
   type: "hashtag" | "user" | "post"
@@ -36,7 +37,7 @@ function App() {
   useInitializeBijoufi()
   useInitializeInteractions()
   useInitializeFollowerData()
-  const [currentPage, setCurrentPage] = useState<Page>("feed")
+  const [currentPage, setCurrentPage] = useState<Page>("landing")
   const [searchFilter, setSearchFilter] = useState<SearchResult | null>(null)
   const [allPosts] = useKV<any[]>("viz-posts", [])
 
@@ -88,6 +89,8 @@ function App() {
 
   const renderPage = () => {
     switch (currentPage) {
+      case "landing":
+        return <Landing />
       case "feed":
         return <Feed searchFilter={searchFilter} onClearSearch={() => setSearchFilter(null)} />
       case "viz-it":
@@ -117,58 +120,75 @@ function App() {
       case "contact":
         return <ContactPage />
       default:
-        return <Feed searchFilter={searchFilter} onClearSearch={() => setSearchFilter(null)} />
+        return <Landing />
     }
   }
 
   const isLegalPage = ["terms", "privacy", "about", "help", "contact"].includes(currentPage)
   const isFullWidthPage = ["manage-followers", "trending"].includes(currentPage)
+  const isLandingPage = currentPage === "landing"
 
   return (
     <div className="min-h-screen bg-background">
       <Toaster />
-      <Header 
-        onNavigateToProfile={() => setCurrentPage("profile")}
-        onNavigateToSettings={() => setCurrentPage("settings")}
-        onNavigateToHome={() => {
-          setCurrentPage("feed")
-          setSearchFilter(null)
-        }}
-        onSearch={handleSearch}
-      />
+      {!isLandingPage && (
+        <Header 
+          onNavigateToProfile={() => setCurrentPage("profile")}
+          onNavigateToSettings={() => setCurrentPage("settings")}
+          onNavigateToHome={() => {
+            setCurrentPage("feed")
+            setSearchFilter(null)
+          }}
+          onSearch={handleSearch}
+        />
+      )}
       
-      <div className="flex">
-        {!isLegalPage && (
-          <Sidebar 
-            activePage={(currentPage === "settings" || currentPage === "manage-followers" || currentPage === "trending" ? "feed" : currentPage) as any}
-            onPageChange={handlePageChange}
-          />
-        )}
-        
-        <main className={`flex-1 ${!isLegalPage ? "lg:ml-64" : ""} pb-20 lg:pb-0`}>
-          <div className={`container ${!isLegalPage && !isFullWidthPage ? "max-w-[600px]" : "max-w-[900px]"} mx-auto px-4 py-8`}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentPage}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                {renderPage()}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </main>
-      </div>
+      {isLandingPage ? (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentPage}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {renderPage()}
+          </motion.div>
+        </AnimatePresence>
+      ) : (
+        <div className="flex">
+          {!isLegalPage && (
+            <Sidebar 
+              activePage={(currentPage === "settings" || currentPage === "manage-followers" || currentPage === "trending" ? "feed" : currentPage) as any}
+              onPageChange={handlePageChange}
+            />
+          )}
+          
+          <main className={`flex-1 ${!isLegalPage ? "lg:ml-64" : ""} pb-20 lg:pb-0`}>
+            <div className={`container ${!isLegalPage && !isFullWidthPage ? "max-w-[600px]" : "max-w-[900px]"} mx-auto px-4 py-8`}>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentPage}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {renderPage()}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </main>
+        </div>
+      )}
       
-      {!isLegalPage && (
+      {!isLegalPage && !isLandingPage && (
         <BottomNav 
           activePage={(currentPage === "settings" || currentPage === "manage-followers" || currentPage === "trending" ? "feed" : currentPage) as any}
           onPageChange={handlePageChange}
         />
       )}
-      <Footer onNavigate={handlePageChange} />
+      {!isLandingPage && <Footer onNavigate={handlePageChange} />}
     </div>
   )
 }

@@ -10,6 +10,7 @@ const projectRoot = process.env.PROJECT_ROOT || import.meta.dirname
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/viz-app/', // Repository name for GitHub Pages
   plugins: [
     react(),
     tailwindcss(),
