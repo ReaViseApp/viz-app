@@ -83,7 +83,7 @@ export const UserBoutiqueExample: React.FC = () => {
             transition={{ delay: 0.2 }}
           >
             <h4 className="text-2xl font-bold mb-2">✨ Featured Collection</h4>
-            <p className="text-gray-700">Summer Vibes 2026 - Limited Edition</p>
+            <p className="text-gray-700">Summer Vibes - Limited Edition</p>
           </motion.div>
 
           {/* Product Grid */}

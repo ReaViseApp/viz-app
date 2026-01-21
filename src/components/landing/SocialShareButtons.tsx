@@ -6,7 +6,7 @@ export const SocialShareButtons: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false)
 
   const shareText = "Check out Viz. - The visual content curation platform! 🎨✨"
-  const shareUrl = "https://viz.app" // Update with actual URL
+  const shareUrl = typeof window !== 'undefined' ? window.location.origin + window.location.pathname : "https://reaviseapp.github.io/viz-app/"
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareUrl)
