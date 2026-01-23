@@ -69,7 +69,7 @@ export const HeroSection: React.FC = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}
         >
-          Curate. Create. Share. Your Visual Story.
+          Create. Curate. Share. Creativity In Other Words.
         </motion.p>
         
         <motion.div 
