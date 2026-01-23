@@ -38,10 +38,10 @@ export const CTASection: React.FC = () => {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-4xl md:text-6xl font-bold mb-6">
-            Ready to start your visual journey?
+            Ready to Viz. it?
           </h2>
           <p className="text-xl md:text-2xl text-gray-700 mb-12">
-            Join thousands of creators curating and sharing their visual stories
+            Join thousands of creators to have your idea Viz.Listed and business grow at Viz.Let!
           </p>
         </motion.div>
 
